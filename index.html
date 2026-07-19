@@ -135,6 +135,10 @@
     background:#F9E4E0;border-color:#D9695A;animation:pulseMic 1.2s infinite;
   }
   @keyframes pulseMic{0%,100%{box-shadow:0 0 0 0 rgba(217,105,90,0.35);}50%{box-shadow:0 0 0 8px rgba(217,105,90,0);}}
+  #micDoneBtn{
+    flex:0 0 auto;font-size:18px;font-weight:800;color:#fff;background:var(--gold);border:none;
+    border-radius:12px;width:46px;cursor:pointer;
+  }
   #nextStageBtn{
     display:none;margin-top:10px;width:100%;font-family:'Nunito',sans-serif;font-weight:800;font-size:14.5px;
     color:var(--ink);background:var(--gold-bg);border:2px solid var(--gold);border-radius:12px;padding:12px;cursor:pointer;
@@ -217,6 +221,7 @@
     </div>
     <div id="inputRow">
       <button id="micBtn" type="button" title="Parler au lieu d'écrire">🎤</button>
+      <button id="micDoneBtn" type="button" style="display:none;" title="Terminé">✓</button>
       <textarea id="userInput" rows="1" placeholder="Écris ta réponse..." data-i18n-placeholder="input_ph"></textarea>
       <button id="sendBtn" data-i18n="send_btn">Envoyer</button>
     </div>
@@ -417,6 +422,7 @@ var els = {
   userInput: document.getElementById('userInput'),
   sendBtn: document.getElementById('sendBtn'),
   micBtn: document.getElementById('micBtn'),
+  micDoneBtn: document.getElementById('micDoneBtn'),
   nextStageBtn: document.getElementById('nextStageBtn'),
   prevStageBtn: document.getElementById('prevStageBtn'),
   resetBtn: document.getElementById('resetBtn'),
@@ -660,15 +666,17 @@ els.userInput.addEventListener('keydown', function(e){
     els.sendBtn.click();
   }
 });
-// Reconnaissance vocale — appuie une fois pour parler, une deuxième fois pour arrêter.
-// Repli silencieux si le navigateur ne le supporte pas (cache simplement le bouton).
+// Reconnaissance vocale — appuie sur le micro pour parler, sur le crochet ✓ quand
+// c'est terminé. Si le navigateur coupe tout seul après un silence (ça arrive sur
+// certains téléphones même avec "continuous"), on redémarre automatiquement sans
+// que la personne s'en aperçoive, tant qu'elle n'a pas appuyé sur ✓ elle-même.
 var SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
 if(SpeechRecognitionAPI){
   var recognition = new SpeechRecognitionAPI();
   recognition.lang = 'fr-CA';
   recognition.continuous = true;
   recognition.interimResults = true;
-  var isListening = false;
+  var wantsListening = false; // vraie intention de la personne — distinct du vrai état technique
   var baseText = '';
 
   recognition.onresult = function(event){
@@ -677,30 +685,46 @@ if(SpeechRecognitionAPI){
       if(event.results[i].isFinal) final += event.results[i][0].transcript;
       else interim += event.results[i][0].transcript;
     }
-    els.userInput.value = (baseText + ' ' + final + ' ' + interim).trim();
+    if(final) baseText = (baseText + ' ' + final).trim();
+    els.userInput.value = (baseText + ' ' + interim).trim();
   };
   recognition.onend = function(){
-    isListening = false;
-    els.micBtn.classList.remove('listening');
-    els.micBtn.textContent = '🎤';
+    if(wantsListening){
+      // Coupure inattendue du navigateur — on redémarre tout de suite, sans que
+      // la personne ait besoin de rien faire.
+      try{ recognition.start(); }catch(e){}
+    } else {
+      els.micBtn.classList.remove('listening');
+      els.micBtn.style.display = 'flex';
+      els.micDoneBtn.style.display = 'none';
+    }
   };
   recognition.onerror = function(e){
     console.log('Erreur reconnaissance vocale:', e.error);
-    isListening = false;
-    els.micBtn.classList.remove('listening');
-    els.micBtn.textContent = '🎤';
+    if(e.error === 'not-allowed' || e.error === 'audio-capture'){
+      wantsListening = false;
+      els.micBtn.classList.remove('listening');
+      els.micBtn.style.display = 'flex';
+      els.micDoneBtn.style.display = 'none';
+    }
+    // Les autres erreurs (comme 'no-speech') sont ignorées — onend va relancer tout seul.
   };
 
   els.micBtn.addEventListener('click', function(){
-    if(isListening){
-      recognition.stop();
-    } else {
-      baseText = els.userInput.value;
-      isListening = true;
-      els.micBtn.classList.add('listening');
-      els.micBtn.textContent = '⏹️';
-      try{ recognition.start(); } catch(e){}
-    }
+    baseText = els.userInput.value;
+    wantsListening = true;
+    els.micBtn.classList.add('listening');
+    els.micBtn.style.display = 'none';
+    els.micDoneBtn.style.display = 'flex';
+    try{ recognition.start(); } catch(e){}
+  });
+
+  els.micDoneBtn.addEventListener('click', function(){
+    wantsListening = false;
+    recognition.stop();
+    els.micBtn.classList.remove('listening');
+    els.micBtn.style.display = 'flex';
+    els.micDoneBtn.style.display = 'none';
   });
 } else {
   els.micBtn.style.display = 'none';
