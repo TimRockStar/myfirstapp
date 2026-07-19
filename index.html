@@ -160,7 +160,10 @@
     <div class="stage-title" id="stageTitle"></div>
     <div class="stage-sub" id="stageSub"></div>
     <div id="messages"></div>
-    <button id="nextStageBtn">Passer à l'étape suivante →</button>
+    <div style="display:flex;gap:8px;margin-top:10px;">
+      <button id="prevStageBtn" style="display:none;flex:0 0 auto;font-family:'Nunito',sans-serif;font-weight:700;font-size:13.5px;color:var(--ink);background:transparent;border:2px solid var(--paper-line);border-radius:12px;padding:12px 16px;cursor:pointer;">← Précédent</button>
+      <button id="nextStageBtn" style="flex:1;">Passer à l'étape suivante →</button>
+    </div>
     <div id="inputRow">
       <textarea id="userInput" rows="1" placeholder="Écris ta réponse..."></textarea>
       <button id="sendBtn">Envoyer</button>
@@ -223,7 +226,7 @@ var STAGES = [
 ];
 
 var currentStage = 0;
-var chatHistory = []; // { role, content } par étape
+// (chatHistory remplacé par stageHistories — voir plus bas, une vraie mémoire par étape)
 var userName = '';
 
 var els = {
@@ -239,6 +242,7 @@ var els = {
   userInput: document.getElementById('userInput'),
   sendBtn: document.getElementById('sendBtn'),
   nextStageBtn: document.getElementById('nextStageBtn'),
+  prevStageBtn: document.getElementById('prevStageBtn'),
   resetBtn: document.getElementById('resetBtn'),
   restartBtn: document.getElementById('restartBtn'),
   downloadBadgeBtn: document.getElementById('downloadBadgeBtn'),
@@ -257,8 +261,8 @@ function renderTrail(){
 var codeBlockStore = {};
 var codeBlockCounter = 0;
 
-function addMessage(role, text, save){
-  if(save !== false) chatHistory.push({ role: role, content: text });
+function addMessage(role, text, save, stageIdx){
+  if(save !== false) stageHistories[stageIdx !== undefined ? stageIdx : currentStage].push({ role: role, content: text });
   var div = document.createElement('div');
   div.className = 'msg ' + (role === 'assistant' ? 'ai' : 'user');
   div.innerHTML = formatMessage(text);
@@ -309,7 +313,8 @@ async function sendToAI(userText){
   els.sendBtn.disabled = true;
 
   var stage = STAGES[currentStage];
-  var messages = [{ role: 'system', content: stage.system }].concat(chatHistory);
+  var systemContent = buildProjectContext() + stage.system;
+  var messages = [{ role: 'system', content: systemContent }].concat(stageHistories[currentStage]);
 
   try{
     var res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -338,7 +343,23 @@ async function sendToAI(userText){
   els.sendBtn.disabled = false;
 }
 
-function startStage(idx, isFirstEver){
+var stageHistories = STAGES.map(function(){ return []; }); // une vraie mémoire par étape, jamais effacée
+
+function buildProjectContext(){
+  // Résume ce qui a été dit dans les étapes précédentes pour que l'IA garde
+  // le fil du vrai projet de la personne, même si chaque étape a son propre système.
+  var parts = [];
+  for(var i = 0; i < currentStage; i++){
+    var userMsgs = stageHistories[i].filter(function(m){ return m.role === 'user'; }).map(function(m){ return m.content; });
+    if(userMsgs.length){
+      parts.push(STAGES[i].title + ' — ' + userMsgs.join(' / '));
+    }
+  }
+  if(!parts.length) return '';
+  return "Contexte du projet discuté jusqu'ici avec cette personne (à respecter, ne pas redemander) :\n" + parts.join('\n') + '\n\n';
+}
+
+function startStage(idx){
   currentStage = idx;
   renderTrail();
   var stage = STAGES[idx];
@@ -346,10 +367,18 @@ function startStage(idx, isFirstEver){
   els.stageSub.textContent = stage.sub;
   els.messages.innerHTML = '';
   els.nextStageBtn.style.display = 'none';
-  chatHistory = [];
+  els.prevStageBtn.style.display = idx > 0 ? 'inline-block' : 'none';
 
-  var firstMsg = stage.firstMsg.replace('{name}', userName);
-  addMessage('assistant', firstMsg);
+  if(stageHistories[idx].length > 0){
+    // On revient sur une étape déjà commencée — on réaffiche sans effacer
+    stageHistories[idx].forEach(function(m){ addMessage(m.role, m.content, false, idx); });
+    if(stageHistories[idx].some(function(m){ return m.role === 'assistant'; }) && stageHistories[idx].length > 1){
+      els.nextStageBtn.style.display = 'block';
+    }
+  } else {
+    var firstMsg = stage.firstMsg.replace('{name}', userName);
+    addMessage('assistant', firstMsg, true, idx);
+  }
   saveProgress();
 }
 
@@ -361,9 +390,15 @@ function nextStage(){
   }
 }
 
+function prevStage(){
+  if(currentStage > 0){
+    startStage(currentStage - 1);
+  }
+}
+
 function saveProgress(){
   localStorage.setItem('myfirstapp_progress', JSON.stringify({
-    name: userName, stage: currentStage, history: chatHistory
+    name: userName, stage: currentStage, histories: stageHistories
   }));
 }
 
@@ -373,7 +408,9 @@ function loadProgress(){
     if(data && data.name){
       userName = data.name;
       currentStage = data.stage || 0;
-      chatHistory = data.history || [];
+      if(data.histories && data.histories.length === STAGES.length){
+        stageHistories = data.histories;
+      }
       return true;
     }
   } catch(e){}
@@ -435,6 +472,7 @@ els.userInput.addEventListener('keydown', function(e){
   }
 });
 els.nextStageBtn.addEventListener('click', nextStage);
+els.prevStageBtn.addEventListener('click', prevStage);
 
 els.resetBtn.addEventListener('click', function(){
   if(confirm('Recommencer depuis le début? Ta progression actuelle sera perdue.')){
@@ -461,8 +499,9 @@ if(loadProgress()){
   var stage = STAGES[currentStage];
   els.stageTitle.textContent = stage.title;
   els.stageSub.textContent = stage.sub;
-  chatHistory.forEach(function(m){ addMessage(m.role, m.content, false); });
-  if(chatHistory.length > 0) els.nextStageBtn.style.display = 'block';
+  els.prevStageBtn.style.display = currentStage > 0 ? 'inline-block' : 'none';
+  stageHistories[currentStage].forEach(function(m){ addMessage(m.role, m.content, false, currentStage); });
+  if(stageHistories[currentStage].length > 1) els.nextStageBtn.style.display = 'block';
 } else {
   renderTrail();
 }
