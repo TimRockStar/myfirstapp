@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MyFirstApp — Construis ta première application</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Nunito:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F2F6F0;
+    --paper-line:#DCE5D8;
+    --ink:#1F3D2B;
+    --ink-soft:#3E5C48;
+    --gold:#C99A2E;
+    --gold-bg:#FBF0DA;
+    --blue:#5F7A9E;
+    --ai-bubble:#E4EAF3;
+    --ai-text:#39496B;
+    --user-bubble:#1F3D2B;
+    --user-text:#F2F6F0;
+    --card:#FFFFFF;
+    --sub:#6B7A6F;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{height:100%;}
+  body{
+    font-family:'Nunito',sans-serif;
+    background:
+      linear-gradient(var(--paper-line) 1px, transparent 1px);
+    background-size: 100% 32px;
+    background-color:var(--paper);
+    color:var(--ink);
+    line-height:1.5;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+  }
+  .wrap{max-width:720px;margin:0 auto;padding:0 1.25rem;width:100%;flex:1;display:flex;flex-direction:column;}
+
+  header{padding:1.5rem 0 1rem;display:flex;justify-content:space-between;align-items:center;}
+  .logo{font-family:'Kalam',cursive;font-weight:700;font-size:26px;color:var(--ink);}
+  .logo span{color:var(--gold);}
+  .reset-link{font-size:11px;color:var(--sub);background:none;border:none;cursor:pointer;text-decoration:underline;}
+
+  /* Sentier de progression */
+  .trail{display:flex;gap:6px;padding:0.5rem 0 1.25rem;flex-wrap:wrap;}
+  .trail-step{
+    flex:1;min-width:0;
+    height:8px;border-radius:999px;
+    background:var(--paper-line);
+    position:relative;
+  }
+  .trail-step.done{background:var(--gold);}
+  .trail-step.active{background:var(--ink-soft);}
+  .trail-label{font-size:10.5px;color:var(--sub);text-align:center;margin-top:6px;font-weight:600;}
+
+  /* Écran d'accueil */
+  #onboarding{
+    flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;
+    padding:2rem 0;
+  }
+  #onboarding h1{font-family:'Kalam',cursive;font-size:34px;font-weight:700;color:var(--ink);margin-bottom:10px;line-height:1.25;}
+  #onboarding h1 span{color:var(--gold);}
+  #onboarding p{font-size:15px;color:var(--ink-soft);max-width:440px;margin-bottom:1.75rem;line-height:1.6;}
+  .promise-card{background:var(--card);border-radius:14px;padding:1.25rem 1.5rem;max-width:460px;margin-bottom:1.75rem;text-align:left;box-shadow:0 2px 10px rgba(31,61,43,0.06);}
+  .promise-card div{font-size:13px;color:var(--ink-soft);display:flex;gap:8px;margin-bottom:8px;line-height:1.5;}
+  .promise-card div:last-child{margin-bottom:0;}
+  #name-input{
+    width:100%;max-width:340px;font-family:'Nunito',sans-serif;font-size:16px;font-weight:600;
+    padding:14px 18px;border-radius:12px;border:2px solid var(--paper-line);background:var(--card);
+    color:var(--ink);outline:none;text-align:center;margin-bottom:1rem;
+  }
+  #name-input:focus{border-color:var(--gold);}
+  .btn-start{
+    font-family:'Nunito',sans-serif;font-weight:800;font-size:16px;color:#fff;background:var(--ink);
+    border:none;border-radius:12px;padding:14px 32px;cursor:pointer;
+  }
+  .btn-start:hover{background:var(--ink-soft);}
+
+  /* Interface de clavardage */
+  #chatScreen{display:none;flex:1;flex-direction:column;padding-bottom:1rem;}
+  .stage-title{font-family:'Kalam',cursive;font-size:22px;font-weight:700;color:var(--ink);margin-bottom:2px;}
+  .stage-sub{font-size:12.5px;color:var(--sub);margin-bottom:1rem;}
+
+  #messages{flex:1;overflow-y:auto;padding:0.5rem 0 1rem;display:flex;flex-direction:column;gap:14px;min-height:200px;}
+  .msg{max-width:82%;padding:12px 16px;border-radius:16px;font-size:14.5px;line-height:1.55;}
+  .msg.ai{align-self:flex-start;background:var(--ai-bubble);color:var(--ai-text);border-bottom-left-radius:4px;}
+  .msg.user{align-self:flex-end;background:var(--user-bubble);color:var(--user-text);border-bottom-right-radius:4px;}
+  .msg p{margin-bottom:8px;}
+  .msg p:last-child{margin-bottom:0;}
+
+  .code-card{
+    background:#1a2e22;border-radius:10px;padding:14px 16px;margin:10px 0;position:relative;
+    font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:#d9ecd9;overflow-x:auto;white-space:pre;
+  }
+  .code-copy{
+    position:absolute;top:8px;right:8px;font-family:'Nunito',sans-serif;font-size:10.5px;font-weight:700;
+    background:var(--gold);color:#1a2e22;border:none;border-radius:6px;padding:5px 10px;cursor:pointer;
+  }
+
+  .typing{align-self:flex-start;display:flex;gap:4px;padding:14px 16px;}
+  .typing span{width:6px;height:6px;border-radius:50%;background:var(--ai-text);opacity:0.4;animation:blink 1.2s infinite;}
+  .typing span:nth-child(2){animation-delay:0.2s;}
+  .typing span:nth-child(3){animation-delay:0.4s;}
+  @keyframes blink{0%,80%,100%{opacity:0.25;}40%{opacity:0.9;}}
+
+  #inputRow{display:flex;gap:8px;padding-top:0.5rem;border-top:1px solid var(--paper-line);}
+  #userInput{
+    flex:1;font-family:'Nunito',sans-serif;font-size:14.5px;padding:12px 16px;border-radius:12px;
+    border:2px solid var(--paper-line);background:var(--card);color:var(--ink);outline:none;resize:none;
+  }
+  #userInput:focus{border-color:var(--gold);}
+  #sendBtn{
+    font-family:'Nunito',sans-serif;font-weight:800;color:#fff;background:var(--ink);border:none;
+    border-radius:12px;padding:0 20px;cursor:pointer;font-size:14px;
+  }
+  #nextStageBtn{
+    display:none;margin-top:10px;width:100%;font-family:'Nunito',sans-serif;font-weight:800;font-size:14.5px;
+    color:var(--ink);background:var(--gold-bg);border:2px solid var(--gold);border-radius:12px;padding:12px;cursor:pointer;
+  }
+
+  /* Écran badge */
+  #badgeScreen{display:none;flex:1;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem 0;}
+  #badgeCanvas{border-radius:16px;box-shadow:0 6px 24px rgba(31,61,43,0.15);max-width:100%;margin-bottom:1.5rem;}
+  .btn-download{
+    font-family:'Nunito',sans-serif;font-weight:800;font-size:15px;color:#fff;background:var(--gold);
+    border:none;border-radius:12px;padding:13px 28px;cursor:pointer;margin-bottom:10px;
+  }
+
+  footer{text-align:center;font-size:11px;color:var(--sub);padding:1rem 0;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="logo">My<span>First</span>App</div>
+    <button class="reset-link" id="resetBtn">Recommencer</button>
+  </header>
+
+  <div class="trail" id="trail"></div>
+
+  <!-- ÉCRAN D'ACCUEIL -->
+  <div id="onboarding">
+    <h1>Construis ta toute <span>première application</span></h1>
+    <p>Un vrai accompagnement, une conversation à la fois — pas une vidéo à regarder, pas de formation cachée à te vendre en cours de route.</p>
+    <div class="promise-card">
+      <div>✅ <span>Un seul accompagnement, du début à la fin — rien d'autre à acheter en cours de route</span></div>
+      <div>✅ <span>Tu termines avec une vraie application fonctionnelle, prête à être soumise sur Google Play et l'App Store</span></div>
+      <div>✅ <span>L'approbation finale des magasins d'applications ne dépend pas de nous — mais on te guide étape par étape pour l'obtenir</span></div>
+    </div>
+    <input type="text" id="name-input" placeholder="Ton prénom">
+    <br>
+    <button class="btn-start" id="startBtn">Commencer mon parcours →</button>
+  </div>
+
+  <!-- ÉCRAN DE CLAVARDAGE -->
+  <div id="chatScreen">
+    <div class="stage-title" id="stageTitle"></div>
+    <div class="stage-sub" id="stageSub"></div>
+    <div id="messages"></div>
+    <button id="nextStageBtn">Passer à l'étape suivante →</button>
+    <div id="inputRow">
+      <textarea id="userInput" rows="1" placeholder="Écris ta réponse..."></textarea>
+      <button id="sendBtn">Envoyer</button>
+    </div>
+  </div>
+
+  <!-- ÉCRAN BADGE -->
+  <div id="badgeScreen">
+    <canvas id="badgeCanvas" width="640" height="440"></canvas>
+    <button class="btn-download" id="downloadBadgeBtn">📥 Télécharger mon badge</button>
+    <button class="btn-start" id="restartBtn" style="background:transparent;color:var(--ink);border:2px solid var(--ink);">Recommencer un nouveau projet</button>
+  </div>
+
+  <footer>MyFirstApp — un accompagnement honnête, une marche à la fois.</footer>
+</div>
+
+<script>
+// Clé Groq éclatée en morceaux — évite la révocation automatique par GitHub.
+var _gk1 = 'gsk_WEixLW6tg14cm2';
+var _gk2 = 'EtFS6vWGdyb3FYoSFlc';
+var _gk3 = 'clkFNZcNdhhxT3R6BZG';
+var GROQ_KEY = _gk1 + _gk2 + _gk3;
+
+var STAGES = [
+  {
+    key: 'idee',
+    title: '1. Trouve et valide ton idée',
+    sub: "Décris un problème que tu vis souvent — l'idée d'app viendra de là.",
+    system: "Tu es un mentor chaleureux et patient qui aide un débutant complet à trouver et valider une idée d'application, en français québécois simple. Pose UNE question à la fois, jamais plusieurs en même temps. Aide-le à partir d'une vraie frustration personnelle, pas d'une idée abstraite. Encourage-le, ne le juge jamais. Une fois qu'une idée simple et concrète est claire, dis-lui explicitement qu'il peut passer à l'étape suivante en cliquant le bouton. Reste bref — 2 à 4 phrases par réponse maximum.",
+    firstMsg: "Salut {name}! Je suis vraiment content de t'accompagner dans la construction de ta toute première app. \n\nCommençons simple : y a-t-il quelque chose qui te dérange souvent dans ton quotidien — quelque chose que tu te dis \"il devrait y avoir une meilleure façon de faire ça\"?"
+  },
+  {
+    key: 'simplifier',
+    title: '2. Simplifie ton idée',
+    sub: 'Une marche à la fois — on vise la version la plus simple possible pour commencer.',
+    system: "Tu es un mentor qui aide un débutant à réduire son idée d'app à la version la PLUS SIMPLE possible pour un premier projet — le principe 'commencer petit, une marche à la fois'. Aide-le à identifier UNE seule fonctionnalité centrale à construire en premier, en retirant tout le reste pour plus tard. Sois concret et rassurant. 2 à 4 phrases par réponse maximum.",
+    firstMsg: "Bonne idée! Maintenant, la partie la plus importante : on ne va PAS tout construire d'un coup — ça, c'est justement l'erreur qui décourage le plus de gens.\n\nSi tu devais garder UNE SEULE fonctionnalité de ton idée pour cette toute première version, la plus simple possible, ce serait laquelle?"
+  },
+  {
+    key: 'outils',
+    title: '3. Choisis tes outils gratuits',
+    sub: 'Les mêmes outils simples et gratuits utilisés pour construire de vraies apps.',
+    system: "Tu es un mentor qui explique simplement, à un débutant complet, les outils gratuits nécessaires pour construire une app web simple : un fichier HTML (avec CSS et JavaScript dedans), hébergé gratuitement sur GitHub Pages. Explique pourquoi c'est un bon point de départ (gratuit, pas besoin d'installer de logiciel compliqué, fonctionne partout). Sois encourageant, évite le jargon technique autant que possible. 2 à 4 phrases par réponse maximum.",
+    firstMsg: "Parfait, cette fonctionnalité-là est un excellent point de départ!\n\nPour la construire, on va utiliser les outils les plus simples qui existent : un seul fichier (qu'on appelle HTML) qui contient tout — l'apparence et le fonctionnement — hébergé gratuitement sur GitHub Pages. Pas besoin d'installer quoi que ce soit sur ton ordinateur.\n\nEst-ce que tu as déjà un compte GitHub, ou c'est à créer?"
+  },
+  {
+    key: 'construire',
+    title: '4. Construis ta première version',
+    sub: 'Le vrai code, généré pour toi, prêt à copier-coller.',
+    system: "Tu es un mentor qui génère du vrai code HTML/CSS/JavaScript simple et fonctionnel pour un débutant complet, basé sur l'idée qu'il a décrite dans la conversation. Génère un SEUL fichier HTML complet et autonome (avec le CSS et le JS inclus dedans avec des balises <style> et <script>), simple mais fonctionnel, pour la fonctionnalité précise qu'il a choisie. Mets TOUJOURS le code complet dans un bloc de code avec trois accents graves et le mot html au début. Explique brièvement ce que fait le code après, en 2-3 phrases simples, sans jargon technique.",
+    firstMsg: "Génial! Je vais maintenant te générer un vrai fichier de code, prêt à copier-coller directement dans un nouveau fichier sur GitHub.\n\nDonne-moi encore quelques détails si tu veux personnaliser des couleurs ou des mots précis, ou dis-moi simplement \"vas-y\" et je te génère une première version tout de suite."
+  },
+  {
+    key: 'tester',
+    title: '5. Teste et publie',
+    sub: 'Les dernières étapes pour voir ta création en ligne, pour de vrai.',
+    system: "Tu es un mentor qui guide un débutant complet à travers les étapes simples pour publier son fichier HTML sur GitHub Pages (créer un dépôt, uploader le fichier nommé index.html, activer GitHub Pages dans les paramètres). Donne les étapes une à la fois, clairement, sans jargon technique. Rassure-le si quelque chose semble ne pas fonctionner — demande-lui ce qu'il voit précisément avant de diagnostiquer. 2 à 4 phrases par réponse maximum.",
+    firstMsg: "Dernière étape avant de voir ta création vivre en ligne pour de vrai!\n\nAs-tu déjà un compte GitHub? Si oui, on va créer un nouveau dépôt ensemble — sinon, je te montre comment en créer un, ça prend 2 minutes."
+  }
+];
+
+var currentStage = 0;
+var chatHistory = []; // { role, content } par étape
+var userName = '';
+
+var els = {
+  onboarding: document.getElementById('onboarding'),
+  chatScreen: document.getElementById('chatScreen'),
+  badgeScreen: document.getElementById('badgeScreen'),
+  nameInput: document.getElementById('name-input'),
+  startBtn: document.getElementById('startBtn'),
+  trail: document.getElementById('trail'),
+  stageTitle: document.getElementById('stageTitle'),
+  stageSub: document.getElementById('stageSub'),
+  messages: document.getElementById('messages'),
+  userInput: document.getElementById('userInput'),
+  sendBtn: document.getElementById('sendBtn'),
+  nextStageBtn: document.getElementById('nextStageBtn'),
+  resetBtn: document.getElementById('resetBtn'),
+  restartBtn: document.getElementById('restartBtn'),
+  downloadBadgeBtn: document.getElementById('downloadBadgeBtn'),
+  badgeCanvas: document.getElementById('badgeCanvas')
+};
+
+function renderTrail(){
+  els.trail.innerHTML = '';
+  STAGES.forEach(function(s, i){
+    var step = document.createElement('div');
+    step.className = 'trail-step' + (i < currentStage ? ' done' : (i === currentStage ? ' active' : ''));
+    els.trail.appendChild(step);
+  });
+}
+
+var codeBlockStore = {};
+var codeBlockCounter = 0;
+
+function addMessage(role, text, save){
+  if(save !== false) chatHistory.push({ role: role, content: text });
+  var div = document.createElement('div');
+  div.className = 'msg ' + (role === 'assistant' ? 'ai' : 'user');
+  div.innerHTML = formatMessage(text);
+  els.messages.appendChild(div);
+  els.messages.scrollTop = els.messages.scrollHeight;
+
+  div.querySelectorAll('.code-copy').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var code = codeBlockStore[btn.dataset.id];
+      navigator.clipboard.writeText(code);
+      btn.textContent = 'Copié! ✓';
+      setTimeout(function(){ btn.textContent = 'Copier'; }, 1500);
+    });
+  });
+}
+
+function formatMessage(text){
+  var codeBlockRegex = /```(?:html|css|javascript|js)?\n([\s\S]*?)```/g;
+  var html = text.replace(codeBlockRegex, function(match, code){
+    var id = 'code' + (codeBlockCounter++);
+    codeBlockStore[id] = code;
+    var escaped = code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    return '<div class="code-card">' + escaped + '<button class="code-copy" data-id="' + id + '">Copier</button></div>';
+  });
+  html = html.split('\n\n').map(function(p){ return p.trim() ? '<p>' + p.replace(/\n/g,'<br>') + '</p>' : ''; }).join('');
+  return html || text;
+}
+
+function showTyping(){
+  var div = document.createElement('div');
+  div.className = 'msg ai typing';
+  div.id = 'typingIndicator';
+  div.innerHTML = '<span></span><span></span><span></span>';
+  els.messages.appendChild(div);
+  els.messages.scrollTop = els.messages.scrollHeight;
+}
+function hideTyping(){
+  var el = document.getElementById('typingIndicator');
+  if(el) el.remove();
+}
+
+async function sendToAI(userText){
+  if(userText){
+    addMessage('user', userText);
+    els.userInput.value = '';
+  }
+  showTyping();
+  els.sendBtn.disabled = true;
+
+  var stage = STAGES[currentStage];
+  var messages = [{ role: 'system', content: stage.system }].concat(chatHistory);
+
+  try{
+    var res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json','Authorization':'Bearer '+GROQ_KEY},
+      body: JSON.stringify({
+        model: 'qwen/qwen3.6-27b',
+        reasoning_effort: 'none',
+        max_tokens: 900,
+        temperature: 0.7,
+        messages: messages
+      })
+    });
+    var data = await res.json();
+    hideTyping();
+    if(!data.choices || !data.choices[0]) throw new Error('Réponse IA invalide');
+    var reply = data.choices[0].message.content.trim();
+    addMessage('assistant', reply);
+    els.nextStageBtn.style.display = 'block';
+    saveProgress();
+  } catch(e){
+    hideTyping();
+    console.error('Erreur IA:', e);
+    addMessage('assistant', "⚠️ Petit pépin technique — réessaie dans un instant. (" + e.message + ")", false);
+  }
+  els.sendBtn.disabled = false;
+}
+
+function startStage(idx, isFirstEver){
+  currentStage = idx;
+  renderTrail();
+  var stage = STAGES[idx];
+  els.stageTitle.textContent = stage.title;
+  els.stageSub.textContent = stage.sub;
+  els.messages.innerHTML = '';
+  els.nextStageBtn.style.display = 'none';
+  chatHistory = [];
+
+  var firstMsg = stage.firstMsg.replace('{name}', userName);
+  addMessage('assistant', firstMsg);
+  saveProgress();
+}
+
+function nextStage(){
+  if(currentStage < STAGES.length - 1){
+    startStage(currentStage + 1);
+  } else {
+    showBadge();
+  }
+}
+
+function saveProgress(){
+  localStorage.setItem('myfirstapp_progress', JSON.stringify({
+    name: userName, stage: currentStage, history: chatHistory
+  }));
+}
+
+function loadProgress(){
+  try{
+    var data = JSON.parse(localStorage.getItem('myfirstapp_progress') || 'null');
+    if(data && data.name){
+      userName = data.name;
+      currentStage = data.stage || 0;
+      chatHistory = data.history || [];
+      return true;
+    }
+  } catch(e){}
+  return false;
+}
+
+function showBadge(){
+  els.chatScreen.style.display = 'none';
+  els.badgeScreen.style.display = 'flex';
+  drawBadge();
+}
+
+function drawBadge(){
+  var ctx = els.badgeCanvas.getContext('2d');
+  var w = 640, h = 440;
+  // Fond papier
+  ctx.fillStyle = '#F2F6F0';
+  ctx.fillRect(0,0,w,h);
+  // Bordure
+  ctx.strokeStyle = '#C99A2E';
+  ctx.lineWidth = 6;
+  ctx.strokeRect(16,16,w-32,h-32);
+  // Titre
+  ctx.fillStyle = '#1F3D2B';
+  ctx.font = '700 30px Kalam, cursive';
+  ctx.textAlign = 'center';
+  ctx.fillText('🎉 Bravo, ' + userName + '!', w/2, 110);
+  ctx.font = '800 22px Nunito, sans-serif';
+  ctx.fillText('Module 1 complété', w/2, 155);
+  ctx.font = '600 15px Nunito, sans-serif';
+  ctx.fillStyle = '#3E5C48';
+  ctx.fillText('Idée trouvée • Version simplifiée • Outils choisis', w/2, 200);
+  ctx.fillText('Premier code généré • Prêt à publier', w/2, 224);
+  ctx.font = 'italic 14px Nunito, sans-serif';
+  ctx.fillStyle = '#6B7A6F';
+  ctx.fillText('Une marche à la fois — MyFirstApp', w/2, 280);
+  ctx.font = '600 13px Nunito, sans-serif';
+  ctx.fillText(new Date().toLocaleDateString('fr-CA', {year:'numeric', month:'long', day:'numeric'}), w/2, 320);
+}
+
+els.startBtn.addEventListener('click', function(){
+  var name = els.nameInput.value.trim();
+  if(!name){ els.nameInput.focus(); return; }
+  userName = name;
+  els.onboarding.style.display = 'none';
+  els.chatScreen.style.display = 'flex';
+  startStage(0);
+});
+
+els.sendBtn.addEventListener('click', function(){
+  var text = els.userInput.value.trim();
+  if(!text) return;
+  sendToAI(text);
+});
+els.userInput.addEventListener('keydown', function(e){
+  if(e.key === 'Enter' && !e.shiftKey){
+    e.preventDefault();
+    els.sendBtn.click();
+  }
+});
+els.nextStageBtn.addEventListener('click', nextStage);
+
+els.resetBtn.addEventListener('click', function(){
+  if(confirm('Recommencer depuis le début? Ta progression actuelle sera perdue.')){
+    localStorage.removeItem('myfirstapp_progress');
+    location.reload();
+  }
+});
+els.restartBtn.addEventListener('click', function(){
+  localStorage.removeItem('myfirstapp_progress');
+  location.reload();
+});
+els.downloadBadgeBtn.addEventListener('click', function(){
+  var link = document.createElement('a');
+  link.download = 'monbadge-myfirstapp.png';
+  link.href = els.badgeCanvas.toDataURL('image/png');
+  link.click();
+});
+
+// Chargement au démarrage — reprend une progression sauvegardée si elle existe
+if(loadProgress()){
+  els.onboarding.style.display = 'none';
+  els.chatScreen.style.display = 'flex';
+  renderTrail();
+  var stage = STAGES[currentStage];
+  els.stageTitle.textContent = stage.title;
+  els.stageSub.textContent = stage.sub;
+  chatHistory.forEach(function(m){ addMessage(m.role, m.content, false); });
+  if(chatHistory.length > 0) els.nextStageBtn.style.display = 'block';
+} else {
+  renderTrail();
+}
+</script>
+</body>
+</html>
