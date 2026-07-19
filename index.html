@@ -124,6 +124,14 @@
     font-family:'Nunito',sans-serif;font-weight:800;color:#fff;background:var(--ink);border:none;
     border-radius:12px;padding:0 20px;cursor:pointer;font-size:14px;
   }
+  #micBtn{
+    flex:0 0 auto;font-size:18px;background:var(--card);border:2px solid var(--paper-line);border-radius:12px;
+    width:46px;cursor:pointer;transition:background .15s,border-color .15s;
+  }
+  #micBtn.listening{
+    background:#F9E4E0;border-color:#D9695A;animation:pulseMic 1.2s infinite;
+  }
+  @keyframes pulseMic{0%,100%{box-shadow:0 0 0 0 rgba(217,105,90,0.35);}50%{box-shadow:0 0 0 8px rgba(217,105,90,0);}}
   #nextStageBtn{
     display:none;margin-top:10px;width:100%;font-family:'Nunito',sans-serif;font-weight:800;font-size:14.5px;
     color:var(--ink);background:var(--gold-bg);border:2px solid var(--gold);border-radius:12px;padding:12px;cursor:pointer;
@@ -199,6 +207,7 @@
       <button id="nextStageBtn" style="flex:1;">Passer à l'étape suivante →</button>
     </div>
     <div id="inputRow">
+      <button id="micBtn" type="button" title="Parler au lieu d'écrire">🎤</button>
       <textarea id="userInput" rows="1" placeholder="Écris ta réponse..."></textarea>
       <button id="sendBtn">Envoyer</button>
     </div>
@@ -226,35 +235,35 @@ var STAGES = [
     key: 'idee',
     title: '1. Trouve et valide ton idée',
     sub: "Décris un problème que tu vis souvent — l'idée d'app viendra de là.",
-    system: "Tu es un mentor chaleureux et patient qui aide un débutant complet à trouver et valider une idée d'application, en français québécois simple. Pose UNE question à la fois, jamais plusieurs en même temps. Aide-le à partir d'une vraie frustration personnelle, pas d'une idée abstraite. Encourage-le, ne le juge jamais. Une fois qu'une idée simple et concrète est claire, dis-lui explicitement qu'il peut passer à l'étape suivante en cliquant le bouton. Reste bref — 2 à 4 phrases par réponse maximum.",
+    system: "Tu es un mentor chaleureux et patient qui aide un débutant complet à trouver et valider une idée d'application, en français québécois simple. Pose UNE question à la fois, jamais plusieurs en même temps. Aide-le à partir d'une vraie frustration personnelle, pas d'une idée abstraite. Encourage-le, ne le juge jamais. Une fois qu'une idée simple et concrète est claire, dis-lui explicitement qu'il peut passer à l'étape suivante en cliquant le bouton. Reste bref — 2 à 4 phrases par réponse maximum. IMPORTANT : ne parle JAMAIS de code, d'outils techniques (HTML, GitHub, etc.) ni ne génère de code à cette étape — ça vient plus tard, dans une étape séparée. Reste concentré uniquement sur l'idée elle-même.",
     firstMsg: "Salut {name}! Je suis vraiment content de t'accompagner dans la construction de ta toute première app. \n\nCommençons simple : y a-t-il quelque chose qui te dérange souvent dans ton quotidien — quelque chose que tu te dis \"il devrait y avoir une meilleure façon de faire ça\"?"
   },
   {
     key: 'simplifier',
     title: '2. Simplifie ton idée',
     sub: 'Une marche à la fois — on vise la version la plus simple possible pour commencer.',
-    system: "Tu es un mentor qui aide un débutant à réduire son idée d'app à la version la PLUS SIMPLE possible pour un premier projet — le principe 'commencer petit, une marche à la fois'. Aide-le à identifier UNE seule fonctionnalité centrale à construire en premier, en retirant tout le reste pour plus tard. Sois concret et rassurant. 2 à 4 phrases par réponse maximum.",
+    system: "Tu es un mentor qui aide un débutant à réduire son idée d'app à la version la PLUS SIMPLE possible pour un premier projet — le principe 'commencer petit, une marche à la fois'. Aide-le à identifier UNE seule fonctionnalité centrale à construire en premier, en retirant tout le reste pour plus tard. Sois concret et rassurant. 2 à 4 phrases par réponse maximum. IMPORTANT : ne génère JAMAIS de code, et ne donne AUCUNE instruction de fichier, de copier-coller, ou de GitHub à cette étape — ça vient plus tard, dans des étapes séparées (choisir les outils, puis construire, puis publier). Reste concentré uniquement sur la simplification de l'idée, en mots simples, sans aucun aspect technique.",
     firstMsg: "Bonne idée! Maintenant, la partie la plus importante : on ne va PAS tout construire d'un coup — ça, c'est justement l'erreur qui décourage le plus de gens.\n\nSi tu devais garder UNE SEULE fonctionnalité de ton idée pour cette toute première version, la plus simple possible, ce serait laquelle?"
   },
   {
     key: 'outils',
     title: '3. Choisis tes outils gratuits',
     sub: 'Les mêmes outils simples et gratuits utilisés pour construire de vraies apps.',
-    system: "Tu es un mentor qui explique simplement, à un débutant complet, les outils gratuits nécessaires pour construire une app web simple : un fichier HTML (avec CSS et JavaScript dedans), hébergé gratuitement sur GitHub Pages. Explique pourquoi c'est un bon point de départ (gratuit, pas besoin d'installer de logiciel compliqué, fonctionne partout). Sois encourageant, évite le jargon technique autant que possible. 2 à 4 phrases par réponse maximum.",
+    system: "Tu es un mentor qui explique simplement, à un débutant complet, les outils gratuits nécessaires pour construire une app web simple : un fichier HTML (avec CSS et JavaScript dedans), hébergé gratuitement sur GitHub Pages. Explique pourquoi c'est un bon point de départ (gratuit, pas besoin d'installer de logiciel compliqué, fonctionne partout). Sois encourageant, évite le jargon technique autant que possible. 2 à 4 phrases par réponse maximum. IMPORTANT : ne génère PAS de code à cette étape, et ne donne pas encore les étapes détaillées de création de compte GitHub — explique seulement CE QUE sont les outils et POURQUOI on les utilise. Les instructions pratiques détaillées viendront dans les étapes suivantes.",
     firstMsg: "Parfait, cette fonctionnalité-là est un excellent point de départ!\n\nPour la construire, on va utiliser les outils les plus simples qui existent : un seul fichier (qu'on appelle HTML) qui contient tout — l'apparence et le fonctionnement — hébergé gratuitement sur GitHub Pages. Pas besoin d'installer quoi que ce soit sur ton ordinateur.\n\nEst-ce que tu as déjà un compte GitHub, ou c'est à créer?"
   },
   {
     key: 'construire',
     title: '4. Construis ta première version',
     sub: 'Le vrai code, généré pour toi, prêt à copier-coller.',
-    system: "Tu es un mentor qui génère du vrai code HTML/CSS/JavaScript simple et fonctionnel pour un débutant complet, basé sur l'idée qu'il a décrite dans la conversation. Génère un SEUL fichier HTML complet et autonome (avec le CSS et le JS inclus dedans avec des balises <style> et <script>), simple mais fonctionnel, pour la fonctionnalité précise qu'il a choisie. Mets TOUJOURS le code complet dans un bloc de code avec trois accents graves et le mot html au début. Explique brièvement ce que fait le code après, en 2-3 phrases simples, sans jargon technique.",
+    system: "Tu es un mentor qui génère du vrai code HTML/CSS/JavaScript simple et fonctionnel pour un débutant complet, basé sur l'idée qu'il a décrite dans la conversation. Génère un SEUL fichier HTML complet et autonome (avec le CSS et le JS inclus dedans avec des balises <style> et <script>), simple mais fonctionnel, pour la fonctionnalité précise qu'il a choisie. Mets TOUJOURS le code complet dans un bloc de code avec trois accents graves et le mot html au début. Après le code, explique en mots très simples, sans jargon : (1) qu'il doit créer un nouveau fichier texte sur son ordinateur avec le Bloc-notes (Windows) ou TextEdit (Mac), (2) coller le code dedans, (3) le sauvegarder en choisissant bien 'Tous les fichiers' comme type et en nommant le fichier exactement index.html (pas .txt), (4) double-cliquer dessus pour l'ouvrir dans son navigateur et voir le résultat tout de suite, avant même de le publier en ligne.",
     firstMsg: "Génial! Je vais maintenant te générer un vrai fichier de code, prêt à copier-coller directement dans un nouveau fichier sur GitHub.\n\nDonne-moi encore quelques détails si tu veux personnaliser des couleurs ou des mots précis, ou dis-moi simplement \"vas-y\" et je te génère une première version tout de suite."
   },
   {
     key: 'tester',
     title: '5. Teste et publie',
     sub: 'Les dernières étapes pour voir ta création en ligne, pour de vrai.',
-    system: "Tu es un mentor qui guide un débutant complet à travers les étapes simples pour publier son fichier HTML sur GitHub Pages (créer un dépôt, uploader le fichier nommé index.html, activer GitHub Pages dans les paramètres). Donne les étapes une à la fois, clairement, sans jargon technique. Rassure-le si quelque chose semble ne pas fonctionner — demande-lui ce qu'il voit précisément avant de diagnostiquer. 2 à 4 phrases par réponse maximum.",
+    system: "Tu es un mentor qui guide un débutant complet à travers les étapes simples pour publier son fichier HTML sur GitHub Pages. Commence TOUJOURS par demander s'il a déjà un compte GitHub — si non, guide-le à travers la création d'un compte gratuit sur github.com d'abord. Ensuite : créer un nouveau dépôt (public, avec un nom simple), uploader le fichier en le renommant exactement index.html, puis activer GitHub Pages dans Settings → Pages (Deploy from a branch, main, /root). Donne les étapes une à la fois, clairement, sans jargon technique, et attends sa confirmation avant de passer à la suivante. Rassure-le si quelque chose semble ne pas fonctionner — demande-lui ce qu'il voit précisément avant de diagnostiquer. 2 à 4 phrases par réponse maximum.",
     firstMsg: "Dernière étape avant de voir ta création vivre en ligne pour de vrai!\n\nAs-tu déjà un compte GitHub? Si oui, on va créer un nouveau dépôt ensemble — sinon, je te montre comment en créer un, ça prend 2 minutes."
   }
 ];
@@ -277,6 +286,7 @@ var els = {
   messages: document.getElementById('messages'),
   userInput: document.getElementById('userInput'),
   sendBtn: document.getElementById('sendBtn'),
+  micBtn: document.getElementById('micBtn'),
   nextStageBtn: document.getElementById('nextStageBtn'),
   prevStageBtn: document.getElementById('prevStageBtn'),
   resetBtn: document.getElementById('resetBtn'),
@@ -512,6 +522,52 @@ els.userInput.addEventListener('keydown', function(e){
     els.sendBtn.click();
   }
 });
+// Reconnaissance vocale — appuie une fois pour parler, une deuxième fois pour arrêter.
+// Repli silencieux si le navigateur ne le supporte pas (cache simplement le bouton).
+var SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+if(SpeechRecognitionAPI){
+  var recognition = new SpeechRecognitionAPI();
+  recognition.lang = 'fr-CA';
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  var isListening = false;
+  var baseText = '';
+
+  recognition.onresult = function(event){
+    var interim = '', final = '';
+    for(var i = event.resultIndex; i < event.results.length; i++){
+      if(event.results[i].isFinal) final += event.results[i][0].transcript;
+      else interim += event.results[i][0].transcript;
+    }
+    els.userInput.value = (baseText + ' ' + final + ' ' + interim).trim();
+  };
+  recognition.onend = function(){
+    isListening = false;
+    els.micBtn.classList.remove('listening');
+    els.micBtn.textContent = '🎤';
+  };
+  recognition.onerror = function(e){
+    console.log('Erreur reconnaissance vocale:', e.error);
+    isListening = false;
+    els.micBtn.classList.remove('listening');
+    els.micBtn.textContent = '🎤';
+  };
+
+  els.micBtn.addEventListener('click', function(){
+    if(isListening){
+      recognition.stop();
+    } else {
+      baseText = els.userInput.value;
+      isListening = true;
+      els.micBtn.classList.add('listening');
+      els.micBtn.textContent = '⏹️';
+      try{ recognition.start(); } catch(e){}
+    }
+  });
+} else {
+  els.micBtn.style.display = 'none';
+}
+
 els.nextStageBtn.addEventListener('click', nextStage);
 els.prevStageBtn.addEventListener('click', prevStage);
 
