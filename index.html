@@ -42,6 +42,9 @@
   .logo{font-family:'Kalam',cursive;font-weight:700;font-size:26px;color:var(--ink);}
   .logo span{color:var(--gold);}
   .reset-link{font-size:11px;color:var(--sub);background:none;border:none;cursor:pointer;text-decoration:underline;}
+  .lang-toggle{display:flex;gap:2px;background:var(--card);border:1px solid var(--paper-line);border-radius:8px;padding:2px;}
+  .lang-btn{font-family:'Nunito',sans-serif;font-size:11px;font-weight:800;color:var(--sub);background:transparent;border:none;border-radius:6px;padding:5px 10px;cursor:pointer;}
+  .lang-btn.active{background:var(--ink);color:#fff;}
 
   /* Sentier de progression */
   .trail{display:flex;gap:6px;padding:0.5rem 0 1.25rem;flex-wrap:wrap;}
@@ -153,47 +156,53 @@
 
   <header>
     <div class="logo">My<span>First</span>App</div>
-    <button class="reset-link" id="resetBtn">Recommencer</button>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div class="lang-toggle">
+        <button class="lang-btn active" id="lang-fr" onclick="setLang('fr')">FR</button>
+        <button class="lang-btn" id="lang-en" onclick="setLang('en')">EN</button>
+      </div>
+      <button class="reset-link" id="resetBtn" data-i18n="reset">Recommencer</button>
+    </div>
   </header>
 
   <div class="trail" id="trail"></div>
 
   <!-- ÉCRAN D'ACCUEIL -->
   <div id="onboarding">
-    <h1>Construis ta toute <span>première application</span></h1>
-    <p>Un vrai accompagnement, une conversation à la fois — pas une vidéo à regarder, pas de formation cachée à te vendre en cours de route.</p>
+    <h1><span data-i18n="onb_title1">Construis ta toute</span> <span data-i18n="onb_title2">première application</span></h1>
+    <p data-i18n="onb_sub">Un vrai accompagnement, une conversation à la fois — pas une vidéo à regarder, pas de formation cachée à te vendre en cours de route.</p>
     <div class="promise-card">
-      <div>✅ <span>Un seul accompagnement, du début à la fin — rien d'autre à acheter en cours de route</span></div>
-      <div>✅ <span>Tu termines avec une vraie application fonctionnelle, prête à être soumise sur Google Play et l'App Store</span></div>
-      <div>✅ <span>L'approbation finale des magasins d'applications ne dépend pas de nous — mais on te guide étape par étape pour l'obtenir</span></div>
+      <div>✅ <span data-i18n="promise1">Un seul accompagnement, du début à la fin — rien d'autre à acheter en cours de route</span></div>
+      <div>✅ <span data-i18n="promise2">Tu termines avec une vraie application fonctionnelle, prête à être soumise sur Google Play et l'App Store</span></div>
+      <div>✅ <span data-i18n="promise3">L'approbation finale des magasins d'applications ne dépend pas de nous — mais on te guide étape par étape pour l'obtenir</span></div>
     </div>
-    <input type="text" id="name-input" placeholder="Ton prénom">
+    <input type="text" id="name-input" placeholder="Ton prénom" data-i18n-placeholder="name_ph">
     <br>
-    <button class="btn-start" id="startBtn">Commencer mon parcours →</button>
+    <button class="btn-start" id="startBtn" data-i18n="start_btn">Commencer mon parcours →</button>
   </div>
 
   <!-- ÉCRAN "MON HISTOIRE" -->
   <div id="storyScreen">
     <div class="story-inner">
-      <h1>Mon histoire</h1>
-      <p class="story-byline">Par Timmy Villeneuve, fondateur de MyFirstApp</p>
+      <h1 data-i18n="story_title">Mon histoire</h1>
+      <p class="story-byline" data-i18n="story_byline">Par Timmy Villeneuve, fondateur de MyFirstApp</p>
 
-      <h2>La peur, au commencement</h2>
-      <p>Comme beaucoup de gens qui n'ont jamais codé de leur vie, l'intelligence artificielle m'a d'abord fait peur — une technologie qui avance tellement rapidement qu'il est facile de se sentir dépassé avant même d'avoir commencé. J'avais une idée en tête, mais aucune idée de quel outil utiliser, ni comment m'y prendre.</p>
+      <h2 data-i18n="story_h1">La peur, au commencement</h2>
+      <p data-i18n="story_p1">Comme beaucoup de gens qui n'ont jamais codé de leur vie, l'intelligence artificielle m'a d'abord fait peur — une technologie qui avance tellement rapidement qu'il est facile de se sentir dépassé avant même d'avoir commencé. J'avais une idée en tête, mais aucune idée de quel outil utiliser, ni comment m'y prendre.</p>
 
-      <h2>La recherche, seul, pendant des mois</h2>
-      <p>Pas de raccourci magique. Des recherches, des tutoriels YouTube, une compréhension qui se bâtit lentement, mois après mois — jusqu'à ce que quelque chose commence enfin à se concrétiser.</p>
+      <h2 data-i18n="story_h2">La recherche, seul, pendant des mois</h2>
+      <p data-i18n="story_p2">Pas de raccourci magique. Des recherches, des tutoriels YouTube, une compréhension qui se bâtit lentement, mois après mois — jusqu'à ce que quelque chose commence enfin à se concrétiser.</p>
 
-      <h2>Les embûches, qui deviennent des leçons</h2>
-      <p>Construire ma première application n'a jamais été une ligne droite — des bugs, des heures passées à chercher pourquoi quelque chose ne fonctionnait pas. Mais chaque embûche traversée est devenue une base plus solide pour la suite. Mon deuxième projet a été bâti en une seule session, presque sans accroc — directement grâce à l'expérience accumulée sur le premier.</p>
+      <h2 data-i18n="story_h3">Les embûches, qui deviennent des leçons</h2>
+      <p data-i18n="story_p3">Construire ma première application n'a jamais été une ligne droite — des bugs, des heures passées à chercher pourquoi quelque chose ne fonctionnait pas. Mais chaque embûche traversée est devenue une base plus solide pour la suite. Mon deuxième projet a été bâti en une seule session, presque sans accroc — directement grâce à l'expérience accumulée sur le premier.</p>
 
-      <h2>Pourquoi je partage ça avec toi</h2>
-      <p>Cette formation existe pour une seule raison simple : t'éviter de vivre seul la même peur, la même confusion du départ, les mêmes erreurs évitables que moi j'ai vécues. Pas une promesse de "crée une app en 5 minutes" — un vrai chemin, avec ses embûches honnêtement racontées.</p>
+      <h2 data-i18n="story_h4">Pourquoi je partage ça avec toi</h2>
+      <p data-i18n="story_p4">Cette formation existe pour une seule raison simple : t'éviter de vivre seul la même peur, la même confusion du départ, les mêmes erreurs évitables que moi j'ai vécues. Pas une promesse de "crée une app en 5 minutes" — un vrai chemin, avec ses embûches honnêtement racontées.</p>
 
-      <h2>À toi qui commences</h2>
-      <p>Si l'IA te fait peur en ce moment, c'est normal — elle m'a fait peur aussi. Si tu ne sais pas par où commencer, c'est normal aussi — je ne le savais pas non plus. La différence entre rester bloqué et avancer, ce n'est pas de ne plus avoir peur. C'est de commencer petit, une marche à la fois, et de laisser chaque embûche devenir la base du prochain pas.</p>
+      <h2 data-i18n="story_h5">À toi qui commences</h2>
+      <p data-i18n="story_p5">Si l'IA te fait peur en ce moment, c'est normal — elle m'a fait peur aussi. Si tu ne sais pas par où commencer, c'est normal aussi — je ne le savais pas non plus. La différence entre rester bloqué et avancer, ce n'est pas de ne plus avoir peur. C'est de commencer petit, une marche à la fois, et de laisser chaque embûche devenir la base du prochain pas.</p>
 
-      <button class="btn-start" id="storyNextBtn">Suivant →</button>
+      <button class="btn-start" id="storyNextBtn" data-i18n="next_simple">Suivant →</button>
     </div>
   </div>
 
@@ -208,29 +217,110 @@
     </div>
     <div id="inputRow">
       <button id="micBtn" type="button" title="Parler au lieu d'écrire">🎤</button>
-      <textarea id="userInput" rows="1" placeholder="Écris ta réponse..."></textarea>
-      <button id="sendBtn">Envoyer</button>
+      <textarea id="userInput" rows="1" placeholder="Écris ta réponse..." data-i18n-placeholder="input_ph"></textarea>
+      <button id="sendBtn" data-i18n="send_btn">Envoyer</button>
     </div>
   </div>
 
   <!-- ÉCRAN BADGE -->
   <div id="badgeScreen">
     <canvas id="badgeCanvas" width="640" height="440"></canvas>
-    <button class="btn-download" id="downloadBadgeBtn">📥 Télécharger mon badge</button>
-    <button class="btn-start" id="restartBtn" style="background:transparent;color:var(--ink);border:2px solid var(--ink);">Recommencer un nouveau projet</button>
+    <button class="btn-download" id="downloadBadgeBtn" data-i18n="download_badge">📥 Télécharger mon badge</button>
+    <button class="btn-start" id="restartBtn" style="background:transparent;color:var(--ink);border:2px solid var(--ink);" data-i18n="restart_project">Recommencer un nouveau projet</button>
   </div>
 
-  <footer>MyFirstApp — un accompagnement honnête, une marche à la fois.</footer>
+  <footer data-i18n="footer_tag">MyFirstApp — un accompagnement honnête, une marche à la fois.</footer>
 </div>
 
 <script>
 // Clé Groq éclatée en morceaux — évite la révocation automatique par GitHub.
+var currentLang = localStorage.getItem('myfirstapp_lang') || 'fr';
+
+var translations = {
+  fr: {
+    reset: 'Recommencer',
+    onb_title1: 'Construis ta toute', onb_title2: 'première application',
+    onb_sub: "Un vrai accompagnement, une conversation à la fois — pas une vidéo à regarder, pas de formation cachée à te vendre en cours de route.",
+    promise1: "Un seul accompagnement, du début à la fin — rien d'autre à acheter en cours de route",
+    promise2: "Tu termines avec une vraie application fonctionnelle, prête à être soumise sur Google Play et l'App Store",
+    promise3: "L'approbation finale des magasins d'applications ne dépend pas de nous — mais on te guide étape par étape pour l'obtenir",
+    name_ph: 'Ton prénom', start_btn: 'Commencer mon parcours →',
+    story_title: 'Mon histoire', story_byline: 'Par Timmy Villeneuve, fondateur de MyFirstApp',
+    story_h1: 'La peur, au commencement',
+    story_p1: "Comme beaucoup de gens qui n'ont jamais codé de leur vie, l'intelligence artificielle m'a d'abord fait peur — une technologie qui avance tellement rapidement qu'il est facile de se sentir dépassé avant même d'avoir commencé. J'avais une idée en tête, mais aucune idée de quel outil utiliser, ni comment m'y prendre.",
+    story_h2: 'La recherche, seul, pendant des mois',
+    story_p2: "Pas de raccourci magique. Des recherches, des tutoriels YouTube, une compréhension qui se bâtit lentement, mois après mois — jusqu'à ce que quelque chose commence enfin à se concrétiser.",
+    story_h3: 'Les embûches, qui deviennent des leçons',
+    story_p3: "Construire ma première application n'a jamais été une ligne droite — des bugs, des heures passées à chercher pourquoi quelque chose ne fonctionnait pas. Mais chaque embûche traversée est devenue une base plus solide pour la suite. Mon deuxième projet a été bâti en une seule session, presque sans accroc — directement grâce à l'expérience accumulée sur le premier.",
+    story_h4: 'Pourquoi je partage ça avec toi',
+    story_p4: 'Cette formation existe pour une seule raison simple : t\'éviter de vivre seul la même peur, la même confusion du départ, les mêmes erreurs évitables que moi j\'ai vécues. Pas une promesse de "crée une app en 5 minutes" — un vrai chemin, avec ses embûches honnêtement racontées.',
+    story_h5: 'À toi qui commences',
+    story_p5: "Si l'IA te fait peur en ce moment, c'est normal — elle m'a fait peur aussi. Si tu ne sais pas par où commencer, c'est normal aussi — je ne le savais pas non plus. La différence entre rester bloqué et avancer, ce n'est pas de ne plus avoir peur. C'est de commencer petit, une marche à la fois, et de laisser chaque embûche devenir la base du prochain pas.",
+    next_simple: 'Suivant →',
+    input_ph: 'Écris ta réponse...', send_btn: 'Envoyer',
+    download_badge: '📥 Télécharger mon badge', restart_project: 'Recommencer un nouveau projet',
+    footer_tag: 'MyFirstApp — un accompagnement honnête, une marche à la fois.',
+    reset_confirm: 'Recommencer depuis le début? Ta progression actuelle sera perdue.'
+  },
+  en: {
+    reset: 'Restart',
+    onb_title1: 'Build your very', onb_title2: 'first application',
+    onb_sub: "Real, one-on-one guidance, one conversation at a time — no video to watch, no hidden course to sell you along the way.",
+    promise1: "One single accompaniment, start to finish — nothing else to buy along the way",
+    promise2: "You finish with a real, working application, ready to submit to Google Play and the App Store",
+    promise3: "Final approval by the app stores isn't up to us — but we guide you step by step to get there",
+    name_ph: 'Your first name', start_btn: 'Start my journey →',
+    story_title: 'My story', story_byline: 'By Timmy Villeneuve, founder of MyFirstApp',
+    story_h1: 'The fear, at the beginning',
+    story_p1: "Like a lot of people who've never coded in their life, artificial intelligence scared me at first — a technology moving so fast it's easy to feel overwhelmed before you even start. I had an idea in mind, but no idea which tool to use, or how to even begin.",
+    story_h2: 'Researching, alone, for months',
+    story_p2: "No magic shortcut. Research, YouTube tutorials, an understanding built slowly, month after month — until something finally started to take shape.",
+    story_h3: 'The obstacles that become lessons',
+    story_p3: "Building my first app was never a straight line — bugs, hours spent figuring out why something wasn't working. But every obstacle crossed became a stronger foundation for what came next. My second project was built in a single session, almost without a hitch — directly thanks to the experience gained from the first one.",
+    story_h4: 'Why I\'m sharing this with you',
+    story_p4: 'This training exists for one simple reason: to help you avoid living through the same fear, the same early confusion, the same avoidable mistakes I went through. Not a "build an app in 5 minutes" promise — a real path, with its obstacles honestly told.',
+    story_h5: 'To you, just starting out',
+    story_p5: "If AI scares you right now, that's normal — it scared me too. If you don't know where to start, that's normal too — I didn't either. The difference between staying stuck and moving forward isn't about no longer being afraid. It's about starting small, one step at a time, and letting every obstacle become the foundation for the next step.",
+    next_simple: 'Next →',
+    input_ph: 'Type your answer...', send_btn: 'Send',
+    download_badge: '📥 Download my badge', restart_project: 'Start a new project',
+    footer_tag: 'MyFirstApp — honest guidance, one step at a time.',
+    reset_confirm: 'Restart from the beginning? Your current progress will be lost.'
+  }
+};
+
+function t(key){
+  return (translations[currentLang] && translations[currentLang][key]) || (translations.fr && translations.fr[key]) || key;
+}
+
+function applyTranslations(){
+  document.querySelectorAll('[data-i18n]').forEach(function(el){
+    el.textContent = t(el.getAttribute('data-i18n'));
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(function(el){
+    el.placeholder = t(el.getAttribute('data-i18n-placeholder'));
+  });
+}
+
+function setLang(lang){
+  currentLang = lang;
+  localStorage.setItem('myfirstapp_lang', lang);
+  document.getElementById('lang-fr').classList.toggle('active', lang === 'fr');
+  document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+  applyTranslations();
+  if(document.getElementById('chatScreen').style.display !== 'none'){
+    var s = getStages()[currentStage];
+    document.getElementById('stageTitle').textContent = s.title;
+    document.getElementById('stageSub').textContent = s.sub;
+  }
+}
+
 var _gk1 = 'gsk_WEixLW6tg14cm2';
 var _gk2 = 'EtFS6vWGdyb3FYoSFlc';
 var _gk3 = 'clkFNZcNdhhxT3R6BZG';
 var GROQ_KEY = _gk1 + _gk2 + _gk3;
 
-var STAGES = [
+var STAGES_FR = [
   {
     key: 'idee',
     title: '1. Trouve et valide ton idée',
@@ -263,10 +353,50 @@ var STAGES = [
     key: 'tester',
     title: '5. Teste et publie',
     sub: 'Les dernières étapes pour voir ta création en ligne, pour de vrai.',
-    system: "Tu es un mentor qui guide un débutant complet à travers les étapes simples pour publier son fichier HTML sur GitHub Pages. Commence TOUJOURS par demander s'il a déjà un compte GitHub — si non, guide-le à travers la création d'un compte gratuit sur github.com d'abord. Ensuite : créer un nouveau dépôt (public, avec un nom simple), uploader le fichier en le renommant exactement index.html, puis activer GitHub Pages dans Settings → Pages (Deploy from a branch, main, /root). Donne les étapes une à la fois, clairement, sans jargon technique, et attends sa confirmation avant de passer à la suivante. Rassure-le si quelque chose semble ne pas fonctionner — demande-lui ce qu'il voit précisément avant de diagnostiquer. 2 à 4 phrases par réponse maximum.",
+    system: "Tu es un mentor qui guide un débutant complet à travers les étapes simples pour publier son fichier HTML sur GitHub Pages. Commence TOUJOURS par demander s'il a déjà un compte GitHub — si non, guide-le à travers la création d'un compte gratuit sur github.com d'abord. IMPORTANT : précise toujours qu'il faut utiliser le NAVIGATEUR web (Chrome ou Safari), pas l'application mobile GitHub — l'app mobile ne permet pas d'uploader de fichiers, seulement le navigateur le permet, même sur téléphone. Mentionne toujours explicitement l'adresse github.com dans tes réponses. Ensuite : créer un nouveau dépôt (public, avec un nom simple), uploader le fichier en le renommant exactement index.html, puis activer GitHub Pages dans Settings → Pages (Deploy from a branch, main, /root). Donne les étapes une à la fois, clairement, sans jargon technique, et attends sa confirmation avant de passer à la suivante. Rassure-le si quelque chose semble ne pas fonctionner — demande-lui ce qu'il voit précisément avant de diagnostiquer. 2 à 4 phrases par réponse maximum.",
     firstMsg: "Dernière étape avant de voir ta création vivre en ligne pour de vrai!\n\nAs-tu déjà un compte GitHub? Si oui, on va créer un nouveau dépôt ensemble — sinon, je te montre comment en créer un, ça prend 2 minutes."
   }
 ];
+
+var STAGES_EN = [
+  {
+    key: 'idee',
+    title: '1. Find and validate your idea',
+    sub: "Describe a problem you often run into — the app idea will come from there.",
+    system: "You are a warm, patient mentor helping a complete beginner find and validate an app idea, in simple English. Ask ONE question at a time, never several at once. Help them start from a real personal frustration, not an abstract idea. Encourage them, never judge. Once a simple, concrete idea is clear, explicitly tell them they can move to the next step by clicking the button. Stay brief — 2 to 4 sentences per reply maximum. IMPORTANT: never talk about code or technical tools (HTML, GitHub, etc.) and never generate code at this stage — that comes later, in a separate step. Stay focused only on the idea itself.",
+    firstMsg: "Hi {name}! I'm really glad to help you build your very first app.\n\nLet's start simple: is there something that bugs you often in your daily life — something where you think \"there should be a better way to do this\"?"
+  },
+  {
+    key: 'simplifier',
+    title: '2. Simplify your idea',
+    sub: 'One step at a time — we aim for the simplest possible version to start.',
+    system: "You are a mentor helping a beginner reduce their app idea to the SIMPLEST possible version for a first project — the 'start small, one step at a time' principle. Help them identify ONE core feature to build first, setting everything else aside for later. Be concrete and reassuring. 2 to 4 sentences per reply maximum. IMPORTANT: never generate code, and give NO file, copy-paste, or GitHub instructions at this stage — that comes later, in separate steps (choosing tools, then building, then publishing). Stay focused only on simplifying the idea, in plain words, with no technical aspect.",
+    firstMsg: "Good idea! Now, the most important part: we're NOT going to build everything at once — that's exactly the mistake that discourages the most people.\n\nIf you had to keep just ONE feature of your idea for this very first version, the simplest possible one, which would it be?"
+  },
+  {
+    key: 'outils',
+    title: '3. Choose your free tools',
+    sub: 'The same simple, free tools used to build real apps.',
+    system: "You are a mentor who simply explains, to a complete beginner, the free tools needed to build a simple web app: one HTML file (with CSS and JavaScript inside it), hosted for free on GitHub Pages. Explain why it's a good starting point (free, no complicated software to install, works everywhere). Be encouraging, avoid technical jargon as much as possible. 2 to 4 sentences per reply maximum. IMPORTANT: do not generate code at this stage, and don't give detailed GitHub account creation steps yet — only explain WHAT the tools are and WHY we use them. Detailed practical instructions come in the following steps.",
+    firstMsg: "Perfect, that feature is an excellent starting point!\n\nTo build it, we'll use the simplest tools that exist: a single file (called HTML) that contains everything — the look and the behavior — hosted for free on GitHub Pages. No need to install anything on your computer.\n\nDo you already have a GitHub account, or do we need to create one?"
+  },
+  {
+    key: 'construire',
+    title: '4. Build your first version',
+    sub: 'Real code, generated for you, ready to copy-paste.',
+    system: "You are a mentor who generates real, simple, functional HTML/CSS/JavaScript code for a complete beginner, based on the idea they described in the conversation. Generate a SINGLE, complete, self-contained HTML file (with CSS and JS included inside it using <style> and <script> tags), simple but functional, for the exact feature they chose. ALWAYS put the complete code in a code block with three backticks and the word html at the start. After the code, explain in very simple words, no jargon: (1) they need to create a new text file on their computer using Notepad (Windows) or TextEdit (Mac), (2) paste the code into it, (3) save it by choosing 'All Files' as the type and naming the file exactly index.html (not .txt), (4) double-click it to open it in their browser and see the result right away, even before publishing it online.",
+    firstMsg: "Awesome! I'll now generate a real code file for you, ready to copy-paste directly into a new file on GitHub.\n\nGive me a few more details if you want to customize colors or specific wording, or just say \"go ahead\" and I'll generate a first version right away."
+  },
+  {
+    key: 'tester',
+    title: '5. Test and publish',
+    sub: 'The final steps to see your creation live online, for real.',
+    system: "You are a mentor guiding a complete beginner through the simple steps to publish their HTML file on GitHub Pages. ALWAYS start by asking if they already have a GitHub account — if not, guide them through creating a free account on github.com first. IMPORTANT: always specify that they need to use a web BROWSER (Chrome or Safari), not the GitHub mobile app — the mobile app doesn't allow file uploads, only the browser does, even on a phone. Always explicitly mention the github.com address in your replies. Then: create a new repository (public, with a simple name), upload the file renaming it exactly index.html, then enable GitHub Pages in Settings → Pages (Deploy from a branch, main, /root). Give the steps one at a time, clearly, without technical jargon, and wait for their confirmation before moving to the next one. Reassure them if something seems not to be working — ask what they're seeing exactly before diagnosing. 2 to 4 sentences per reply maximum.",
+    firstMsg: "Last step before seeing your creation live online, for real!\n\nDo you already have a GitHub account? If so, we'll create a new repository together — if not, I'll show you how to create one, it takes 2 minutes."
+  }
+];
+
+function getStages(){ return currentLang === 'en' ? STAGES_EN : STAGES_FR; }
 
 var currentStage = 0;
 // (chatHistory remplacé par stageHistories — voir plus bas, une vraie mémoire par étape)
@@ -297,7 +427,7 @@ var els = {
 
 function renderTrail(){
   els.trail.innerHTML = '';
-  STAGES.forEach(function(s, i){
+  getStages().forEach(function(s, i){
     var step = document.createElement('div');
     step.className = 'trail-step' + (i < currentStage ? ' done' : (i === currentStage ? ' active' : ''));
     els.trail.appendChild(step);
@@ -333,7 +463,14 @@ function formatMessage(text){
     var escaped = code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     return '<div class="code-card">' + escaped + '<button class="code-copy" data-id="' + id + '">Copier</button></div>';
   });
-  html = html.split('\n\n').map(function(p){ return p.trim() ? '<p>' + p.replace(/\n/g,'<br>') + '</p>' : ''; }).join('');
+  html = html.split('\n\n').map(function(p){
+    if(!p.trim()) return '';
+    var withLinks = p.replace(/(https?:\/\/[^\s<]+|\bgithub\.com[^\s<]*|\bconsole\.groq\.com[^\s<]*)/gi, function(url){
+      var href = url.indexOf('http') === 0 ? url : 'https://' + url;
+      return '<a href="' + href + '" target="_blank" rel="noopener" style="color:var(--gold);font-weight:700;">' + url + '</a>';
+    });
+    return '<p>' + withLinks.replace(/\n/g,'<br>') + '</p>';
+  }).join('');
   return html || text;
 }
 
@@ -358,7 +495,7 @@ async function sendToAI(userText){
   showTyping();
   els.sendBtn.disabled = true;
 
-  var stage = STAGES[currentStage];
+  var stage = getStages()[currentStage];
   var systemContent = buildProjectContext() + stage.system;
   var messages = [{ role: 'system', content: systemContent }].concat(stageHistories[currentStage]);
 
@@ -389,7 +526,7 @@ async function sendToAI(userText){
   els.sendBtn.disabled = false;
 }
 
-var stageHistories = STAGES.map(function(){ return []; }); // une vraie mémoire par étape, jamais effacée
+var stageHistories = STAGES_FR.map(function(){ return []; }); // une vraie mémoire par étape, jamais effacée
 
 function buildProjectContext(){
   // Résume ce qui a été dit dans les étapes précédentes pour que l'IA garde
@@ -398,7 +535,7 @@ function buildProjectContext(){
   for(var i = 0; i < currentStage; i++){
     var userMsgs = stageHistories[i].filter(function(m){ return m.role === 'user'; }).map(function(m){ return m.content; });
     if(userMsgs.length){
-      parts.push(STAGES[i].title + ' — ' + userMsgs.join(' / '));
+      parts.push(getStages()[i].title + ' — ' + userMsgs.join(' / '));
     }
   }
   if(!parts.length) return '';
@@ -408,7 +545,7 @@ function buildProjectContext(){
 function startStage(idx){
   currentStage = idx;
   renderTrail();
-  var stage = STAGES[idx];
+  var stage = getStages()[idx];
   els.stageTitle.textContent = stage.title;
   els.stageSub.textContent = stage.sub;
   els.messages.innerHTML = '';
@@ -429,7 +566,7 @@ function startStage(idx){
 }
 
 function nextStage(){
-  if(currentStage < STAGES.length - 1){
+  if(currentStage < getStages().length - 1){
     startStage(currentStage + 1);
   } else {
     showBadge();
@@ -454,7 +591,7 @@ function loadProgress(){
     if(data && data.name){
       userName = data.name;
       currentStage = data.stage || 0;
-      if(data.histories && data.histories.length === STAGES.length){
+      if(data.histories && data.histories.length === getStages().length){
         stageHistories = data.histories;
       }
       return true;
@@ -472,6 +609,7 @@ function showBadge(){
 function drawBadge(){
   var ctx = els.badgeCanvas.getContext('2d');
   var w = 640, h = 440;
+  var fr = currentLang !== 'en';
   // Fond papier
   ctx.fillStyle = '#F2F6F0';
   ctx.fillRect(0,0,w,h);
@@ -483,18 +621,18 @@ function drawBadge(){
   ctx.fillStyle = '#1F3D2B';
   ctx.font = '700 30px Kalam, cursive';
   ctx.textAlign = 'center';
-  ctx.fillText('🎉 Bravo, ' + userName + '!', w/2, 110);
+  ctx.fillText((fr?'🎉 Bravo, ':'🎉 Well done, ') + userName + '!', w/2, 110);
   ctx.font = '800 22px Nunito, sans-serif';
-  ctx.fillText('Module 1 complété', w/2, 155);
+  ctx.fillText(fr?'Module 1 complété':'Module 1 completed', w/2, 155);
   ctx.font = '600 15px Nunito, sans-serif';
   ctx.fillStyle = '#3E5C48';
-  ctx.fillText('Idée trouvée • Version simplifiée • Outils choisis', w/2, 200);
-  ctx.fillText('Premier code généré • Prêt à publier', w/2, 224);
+  ctx.fillText(fr?'Idée trouvée • Version simplifiée • Outils choisis':'Idea found • Version simplified • Tools chosen', w/2, 200);
+  ctx.fillText(fr?'Premier code généré • Prêt à publier':'First code generated • Ready to publish', w/2, 224);
   ctx.font = 'italic 14px Nunito, sans-serif';
   ctx.fillStyle = '#6B7A6F';
-  ctx.fillText('Une marche à la fois — MyFirstApp', w/2, 280);
+  ctx.fillText(fr?'Une marche à la fois — MyFirstApp':'One step at a time — MyFirstApp', w/2, 280);
   ctx.font = '600 13px Nunito, sans-serif';
-  ctx.fillText(new Date().toLocaleDateString('fr-CA', {year:'numeric', month:'long', day:'numeric'}), w/2, 320);
+  ctx.fillText(new Date().toLocaleDateString(fr?'fr-CA':'en-CA', {year:'numeric', month:'long', day:'numeric'}), w/2, 320);
 }
 
 els.startBtn.addEventListener('click', function(){
@@ -572,7 +710,7 @@ els.nextStageBtn.addEventListener('click', nextStage);
 els.prevStageBtn.addEventListener('click', prevStage);
 
 els.resetBtn.addEventListener('click', function(){
-  if(confirm('Recommencer depuis le début? Ta progression actuelle sera perdue.')){
+  if(confirm(t('reset_confirm'))){
     localStorage.removeItem('myfirstapp_progress');
     location.reload();
   }
@@ -589,11 +727,15 @@ els.downloadBadgeBtn.addEventListener('click', function(){
 });
 
 // Chargement au démarrage — reprend une progression sauvegardée si elle existe
+document.getElementById('lang-fr').classList.toggle('active', currentLang === 'fr');
+document.getElementById('lang-en').classList.toggle('active', currentLang === 'en');
+applyTranslations();
+
 if(loadProgress()){
   els.onboarding.style.display = 'none';
   els.chatScreen.style.display = 'flex';
   renderTrail();
-  var stage = STAGES[currentStage];
+  var stage = getStages()[currentStage];
   els.stageTitle.textContent = stage.title;
   els.stageSub.textContent = stage.sub;
   els.prevStageBtn.style.display = currentStage > 0 ? 'inline-block' : 'none';
