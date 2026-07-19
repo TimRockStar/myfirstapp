@@ -78,6 +78,15 @@
   }
   .btn-start:hover{background:var(--ink-soft);}
 
+  /* Écran "Mon histoire" */
+  #storyScreen{display:none;flex:1;padding:1rem 0 2rem;overflow-y:auto;}
+  .story-inner{max-width:520px;margin:0 auto;}
+  .story-inner h1{font-family:'Kalam',cursive;font-size:32px;font-weight:700;color:var(--ink);margin-bottom:4px;}
+  .story-byline{font-size:13px;color:var(--sub);font-style:italic;margin-bottom:1.75rem;}
+  .story-inner h2{font-family:'Kalam',cursive;font-size:19px;font-weight:700;color:var(--gold);margin:1.5rem 0 6px;}
+  .story-inner p{font-size:14.5px;color:var(--ink-soft);line-height:1.65;}
+  #storyNextBtn{margin-top:2rem;width:100%;}
+
   /* Interface de clavardage */
   #chatScreen{display:none;flex:1;flex-direction:column;padding-bottom:1rem;}
   .stage-title{font-family:'Kalam',cursive;font-size:22px;font-weight:700;color:var(--ink);margin-bottom:2px;}
@@ -153,6 +162,31 @@
     <input type="text" id="name-input" placeholder="Ton prénom">
     <br>
     <button class="btn-start" id="startBtn">Commencer mon parcours →</button>
+  </div>
+
+  <!-- ÉCRAN "MON HISTOIRE" -->
+  <div id="storyScreen">
+    <div class="story-inner">
+      <h1>Mon histoire</h1>
+      <p class="story-byline">Par Timmy Villeneuve, fondateur de MyFirstApp</p>
+
+      <h2>La peur, au commencement</h2>
+      <p>Comme beaucoup de gens qui n'ont jamais codé de leur vie, l'intelligence artificielle m'a d'abord fait peur — une technologie qui avance tellement rapidement qu'il est facile de se sentir dépassé avant même d'avoir commencé. J'avais une idée en tête, mais aucune idée de quel outil utiliser, ni comment m'y prendre.</p>
+
+      <h2>La recherche, seul, pendant des mois</h2>
+      <p>Pas de raccourci magique. Des recherches, des tutoriels YouTube, une compréhension qui se bâtit lentement, mois après mois — jusqu'à ce que quelque chose commence enfin à se concrétiser.</p>
+
+      <h2>Les embûches, qui deviennent des leçons</h2>
+      <p>Construire ma première application n'a jamais été une ligne droite — des bugs, des heures passées à chercher pourquoi quelque chose ne fonctionnait pas. Mais chaque embûche traversée est devenue une base plus solide pour la suite. Mon deuxième projet a été bâti en une seule session, presque sans accroc — directement grâce à l'expérience accumulée sur le premier.</p>
+
+      <h2>Pourquoi je partage ça avec toi</h2>
+      <p>Cette formation existe pour une seule raison simple : t'éviter de vivre seul la même peur, la même confusion du départ, les mêmes erreurs évitables que moi j'ai vécues. Pas une promesse de "crée une app en 5 minutes" — un vrai chemin, avec ses embûches honnêtement racontées.</p>
+
+      <h2>À toi qui commences</h2>
+      <p>Si l'IA te fait peur en ce moment, c'est normal — elle m'a fait peur aussi. Si tu ne sais pas par où commencer, c'est normal aussi — je ne le savais pas non plus. La différence entre rester bloqué et avancer, ce n'est pas de ne plus avoir peur. C'est de commencer petit, une marche à la fois, et de laisser chaque embûche devenir la base du prochain pas.</p>
+
+      <button class="btn-start" id="storyNextBtn">Suivant →</button>
+    </div>
   </div>
 
   <!-- ÉCRAN DE CLAVARDAGE -->
@@ -231,6 +265,8 @@ var userName = '';
 
 var els = {
   onboarding: document.getElementById('onboarding'),
+  storyScreen: document.getElementById('storyScreen'),
+  storyNextBtn: document.getElementById('storyNextBtn'),
   chatScreen: document.getElementById('chatScreen'),
   badgeScreen: document.getElementById('badgeScreen'),
   nameInput: document.getElementById('name-input'),
@@ -456,6 +492,11 @@ els.startBtn.addEventListener('click', function(){
   if(!name){ els.nameInput.focus(); return; }
   userName = name;
   els.onboarding.style.display = 'none';
+  els.storyScreen.style.display = 'block';
+});
+
+els.storyNextBtn.addEventListener('click', function(){
+  els.storyScreen.style.display = 'none';
   els.chatScreen.style.display = 'flex';
   startStage(0);
 });
