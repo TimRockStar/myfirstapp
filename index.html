@@ -127,18 +127,6 @@
     font-family:'Nunito',sans-serif;font-weight:800;color:#fff;background:var(--ink);border:none;
     border-radius:12px;padding:0 20px;cursor:pointer;font-size:14px;
   }
-  #micBtn{
-    flex:0 0 auto;font-size:18px;background:var(--card);border:2px solid var(--paper-line);border-radius:12px;
-    width:46px;cursor:pointer;transition:background .15s,border-color .15s;
-  }
-  #micBtn.listening{
-    background:#F9E4E0;border-color:#D9695A;animation:pulseMic 1.2s infinite;
-  }
-  @keyframes pulseMic{0%,100%{box-shadow:0 0 0 0 rgba(217,105,90,0.35);}50%{box-shadow:0 0 0 8px rgba(217,105,90,0);}}
-  #micDoneBtn{
-    flex:0 0 auto;font-size:18px;font-weight:800;color:#fff;background:var(--gold);border:none;
-    border-radius:12px;width:46px;cursor:pointer;
-  }
   #nextStageBtn{
     display:none;margin-top:10px;width:100%;font-family:'Nunito',sans-serif;font-weight:800;font-size:14.5px;
     color:var(--ink);background:var(--gold-bg);border:2px solid var(--gold);border-radius:12px;padding:12px;cursor:pointer;
@@ -223,8 +211,6 @@
       <button id="nextStageBtn" style="flex:1;">Passer à l'étape suivante →</button>
     </div>
     <div id="inputRow">
-      <button id="micBtn" type="button" title="Parler au lieu d'écrire">🎤</button>
-      <button id="micDoneBtn" type="button" style="display:none;" title="Terminé">✓</button>
       <textarea id="userInput" rows="1" placeholder="Écris ta réponse..." data-i18n-placeholder="input_ph"></textarea>
       <button id="sendBtn" data-i18n="send_btn">Envoyer</button>
     </div>
@@ -424,8 +410,6 @@ var els = {
   messages: document.getElementById('messages'),
   userInput: document.getElementById('userInput'),
   sendBtn: document.getElementById('sendBtn'),
-  micBtn: document.getElementById('micBtn'),
-  micDoneBtn: document.getElementById('micDoneBtn'),
   nextStageBtn: document.getElementById('nextStageBtn'),
   prevStageBtn: document.getElementById('prevStageBtn'),
   resetBtn: document.getElementById('resetBtn'),
@@ -680,16 +664,6 @@ els.storyNextBtn.addEventListener('click', function(){
 els.sendBtn.addEventListener('click', function(){
   var text = els.userInput.value.trim();
   if(!text) return;
-  // Si le micro écoute encore, on l'arrête avant d'envoyer — sinon il continue
-  // de réécrire par-dessus la boîte de texte juste après qu'elle se soit vidée.
-  if(typeof wantsListening !== 'undefined' && wantsListening){
-    wantsListening = false;
-    skipInputUpdateOnEnd = true;
-    recognition.stop();
-    els.micBtn.classList.remove('listening');
-    els.micBtn.style.display = 'flex';
-    els.micDoneBtn.style.display = 'none';
-  }
   sendToAI(text);
 });
 els.userInput.addEventListener('keydown', function(e){
@@ -698,78 +672,6 @@ els.userInput.addEventListener('keydown', function(e){
     els.sendBtn.click();
   }
 });
-// Reconnaissance vocale — mode simple et stable : chaque "session" capture une
-// phrase à la fois. Si le navigateur s'arrête pendant une pause naturelle et que
-// la personne n'a pas encore appuyé sur ✓, on redémarre une NOUVELLE session
-// proprement (jamais en surimpression de l'ancienne) — ça évite les répétitions.
-var SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
-if(SpeechRecognitionAPI){
-  var recognition = new SpeechRecognitionAPI();
-  recognition.lang = 'fr-CA';
-  recognition.continuous = false; // une session = une phrase, plus stable sur mobile
-  recognition.interimResults = true;
-  var wantsListening = false;
-  var skipInputUpdateOnEnd = false; // évite que le nettoyage du micro n'écrase la boîte juste vidée par l'envoi
-  var baseText = '';
-  var sessionFinalText = ''; // texte confirmé de la session EN COURS seulement
-
-  recognition.onresult = function(event){
-    var interim = '', final = '';
-    for(var i = 0; i < event.results.length; i++){
-      if(event.results[i].isFinal) final += event.results[i][0].transcript;
-      else interim += event.results[i][0].transcript;
-    }
-    sessionFinalText = final;
-    els.userInput.value = (baseText + ' ' + sessionFinalText + ' ' + interim).trim();
-  };
-  recognition.onend = function(){
-    // La session est vraiment terminée — on fige son texte confirmé dans baseText,
-    // une seule fois, jamais rejoué.
-    if(sessionFinalText){
-      baseText = (baseText + ' ' + sessionFinalText).trim();
-      sessionFinalText = '';
-    }
-    if(!skipInputUpdateOnEnd){ els.userInput.value = baseText; }
-    skipInputUpdateOnEnd = false;
-
-    if(wantsListening){
-      // Redémarre tout de suite, sans délai — chaque petit délai ici risque de
-      // perdre les premiers mots si la personne recommence à parler rapidement.
-      try{ recognition.start(); }catch(e){}
-    } else {
-      els.micBtn.classList.remove('listening');
-      els.micBtn.style.display = 'flex';
-      els.micDoneBtn.style.display = 'none';
-    }
-  };
-  recognition.onerror = function(e){
-    console.log('Erreur reconnaissance vocale:', e.error);
-    if(e.error === 'not-allowed' || e.error === 'audio-capture'){
-      wantsListening = false;
-    }
-    // Les autres erreurs (comme 'no-speech') sont ignorées — onend gère le redémarrage.
-  };
-
-  els.micBtn.addEventListener('click', function(){
-    baseText = els.userInput.value;
-    sessionFinalText = '';
-    wantsListening = true;
-    els.micBtn.classList.add('listening');
-    els.micBtn.style.display = 'none';
-    els.micDoneBtn.style.display = 'flex';
-    try{ recognition.start(); } catch(e){}
-  });
-
-  els.micDoneBtn.addEventListener('click', function(){
-    wantsListening = false;
-    recognition.stop();
-    els.micBtn.classList.remove('listening');
-    els.micBtn.style.display = 'flex';
-    els.micDoneBtn.style.display = 'none';
-  });
-} else {
-  els.micBtn.style.display = 'none';
-}
 
 els.nextStageBtn.addEventListener('click', nextStage);
 els.prevStageBtn.addEventListener('click', prevStage);
