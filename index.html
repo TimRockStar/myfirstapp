@@ -205,6 +205,7 @@
   <div id="chatScreen">
     <div class="stage-title" id="stageTitle"></div>
     <div class="stage-sub" id="stageSub"></div>
+    <div id="stageResource" style="display:none;background:var(--gold-bg);border:2px solid var(--gold);border-radius:12px;padding:12px 16px;margin-bottom:12px;font-size:13px;color:var(--ink);"></div>
     <div id="messages"></div>
     <div style="display:flex;gap:8px;margin-top:10px;">
       <button id="prevStageBtn" style="display:none;flex:0 0 auto;font-family:'Nunito',sans-serif;font-weight:700;font-size:13.5px;color:var(--ink);background:transparent;border:2px solid var(--paper-line);border-radius:12px;padding:12px 16px;cursor:pointer;">← Précédent</button>
@@ -306,6 +307,7 @@ function setLang(lang){
     var s = getStages()[currentStage];
     document.getElementById('stageTitle').textContent = s.title;
     document.getElementById('stageSub').textContent = s.sub;
+    updateStageResource(currentStage);
   }
 }
 
@@ -554,6 +556,22 @@ function buildProjectContext(){
   return "Contexte du projet discuté jusqu'ici avec cette personne (à respecter, ne pas redemander) :\n" + parts.join('\n') + '\n\n';
 }
 
+function updateStageResource(idx){
+  var fr = currentLang !== 'en';
+  var box = document.getElementById('stageResource');
+  // Ressource attachée à l'étape "Teste et publie" (index 4) — le guide GitHub complet
+  if(idx === 4){
+    box.style.display = 'block';
+    box.innerHTML = (fr ? '📄 <b>Document complet :</b> ' : '📄 <b>Full document:</b> ') +
+      '<a href="Comment_Creer_Compte_GitHub.docx" download style="color:var(--ink);font-weight:700;">' +
+      (fr ? 'Comment créer ton compte GitHub (Word) ↓' : 'How to create your GitHub account (Word) ↓') +
+      '</a>';
+  } else {
+    box.style.display = 'none';
+    box.innerHTML = '';
+  }
+}
+
 function startStage(idx){
   currentStage = idx;
   renderTrail();
@@ -563,6 +581,7 @@ function startStage(idx){
   els.messages.innerHTML = '';
   els.nextStageBtn.style.display = 'none';
   els.prevStageBtn.style.display = idx > 0 ? 'inline-block' : 'none';
+  updateStageResource(idx);
 
   if(stageHistories[idx].length > 0){
     // On revient sur une étape déjà commencée — on réaffiche sans effacer
@@ -705,6 +724,7 @@ if(loadProgress()){
   var stage = getStages()[currentStage];
   els.stageTitle.textContent = stage.title;
   els.stageSub.textContent = stage.sub;
+  updateStageResource(currentStage);
   els.prevStageBtn.style.display = currentStage > 0 ? 'inline-block' : 'none';
   stageHistories[currentStage].forEach(function(m){ addMessage(m.role, m.content, false, currentStage); });
   if(stageHistories[currentStage].length > 1) els.nextStageBtn.style.display = 'block';
