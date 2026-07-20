@@ -666,33 +666,42 @@ els.userInput.addEventListener('keydown', function(e){
     els.sendBtn.click();
   }
 });
-// Reconnaissance vocale — appuie sur le micro pour parler, sur le crochet ✓ quand
-// c'est terminé. Si le navigateur coupe tout seul après un silence (ça arrive sur
-// certains téléphones même avec "continuous"), on redémarre automatiquement sans
-// que la personne s'en aperçoive, tant qu'elle n'a pas appuyé sur ✓ elle-même.
+// Reconnaissance vocale — mode simple et stable : chaque "session" capture une
+// phrase à la fois. Si le navigateur s'arrête pendant une pause naturelle et que
+// la personne n'a pas encore appuyé sur ✓, on redémarre une NOUVELLE session
+// proprement (jamais en surimpression de l'ancienne) — ça évite les répétitions.
 var SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
 if(SpeechRecognitionAPI){
   var recognition = new SpeechRecognitionAPI();
   recognition.lang = 'fr-CA';
-  recognition.continuous = true;
+  recognition.continuous = false; // une session = une phrase, plus stable sur mobile
   recognition.interimResults = true;
-  var wantsListening = false; // vraie intention de la personne — distinct du vrai état technique
+  var wantsListening = false;
   var baseText = '';
+  var sessionFinalText = ''; // texte confirmé de la session EN COURS seulement
 
   recognition.onresult = function(event){
     var interim = '', final = '';
-    for(var i = event.resultIndex; i < event.results.length; i++){
+    for(var i = 0; i < event.results.length; i++){
       if(event.results[i].isFinal) final += event.results[i][0].transcript;
       else interim += event.results[i][0].transcript;
     }
-    if(final) baseText = (baseText + ' ' + final).trim();
-    els.userInput.value = (baseText + ' ' + interim).trim();
+    sessionFinalText = final;
+    els.userInput.value = (baseText + ' ' + sessionFinalText + ' ' + interim).trim();
   };
   recognition.onend = function(){
+    // La session est vraiment terminée — on fige son texte confirmé dans baseText,
+    // une seule fois, jamais rejoué.
+    if(sessionFinalText){
+      baseText = (baseText + ' ' + sessionFinalText).trim();
+      sessionFinalText = '';
+    }
+    els.userInput.value = baseText;
+
     if(wantsListening){
-      // Coupure inattendue du navigateur — on redémarre tout de suite, sans que
-      // la personne ait besoin de rien faire.
-      try{ recognition.start(); }catch(e){}
+      setTimeout(function(){
+        if(wantsListening){ try{ recognition.start(); }catch(e){} }
+      }, 300); // petite pause avant de relancer — évite le cycle rapide qui causait le bug
     } else {
       els.micBtn.classList.remove('listening');
       els.micBtn.style.display = 'flex';
@@ -703,15 +712,13 @@ if(SpeechRecognitionAPI){
     console.log('Erreur reconnaissance vocale:', e.error);
     if(e.error === 'not-allowed' || e.error === 'audio-capture'){
       wantsListening = false;
-      els.micBtn.classList.remove('listening');
-      els.micBtn.style.display = 'flex';
-      els.micDoneBtn.style.display = 'none';
     }
-    // Les autres erreurs (comme 'no-speech') sont ignorées — onend va relancer tout seul.
+    // Les autres erreurs (comme 'no-speech') sont ignorées — onend gère le redémarrage.
   };
 
   els.micBtn.addEventListener('click', function(){
     baseText = els.userInput.value;
+    sessionFinalText = '';
     wantsListening = true;
     els.micBtn.classList.add('listening');
     els.micBtn.style.display = 'none';
