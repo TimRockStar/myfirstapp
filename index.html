@@ -462,7 +462,7 @@ function addMessage(role, text, save, stageIdx){
 }
 
 function formatMessage(text){
-  var codeBlockRegex = /```(?:html|css|javascript|js)?\n([\s\S]*?)```/g;
+  var codeBlockRegex = /```[ \t]*(?:html|css|javascript|js)?[ \t]*\r?\n([\s\S]*?)```/gi;
   var html = text.replace(codeBlockRegex, function(match, code){
     var id = 'code' + (codeBlockCounter++);
     codeBlockStore[id] = code;
@@ -504,6 +504,9 @@ async function sendToAI(userText){
   var stage = getStages()[currentStage];
   var systemContent = buildProjectContext() + stage.system;
   var messages = [{ role: 'system', content: systemContent }].concat(stageHistories[currentStage]);
+  // La génération de code (étape 4) est plus fiable avec une température plus basse
+  // — moins de variation créative inutile, moins de risque de réponse qui déraille.
+  var temp = (stage.key === 'construire') ? 0.3 : 0.7;
 
   try{
     var res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -512,15 +515,29 @@ async function sendToAI(userText){
       body: JSON.stringify({
         model: 'qwen/qwen3.6-27b',
         reasoning_effort: 'none',
-        max_tokens: 900,
-        temperature: 0.7,
+        max_tokens: 1600,
+        temperature: temp,
         messages: messages
       })
     });
     var data = await res.json();
+    console.log('[MyFirstApp] Réponse brute:', data);
     hideTyping();
     if(!data.choices || !data.choices[0]) throw new Error('Réponse IA invalide');
     var reply = data.choices[0].message.content.trim();
+
+    // Détecte une réponse cassée (bloc de code ouvert mais jamais fermé) plutôt que
+    // d'afficher du texte brisé — propose un vrai réessai à la place.
+    var openFences = (reply.match(/```/g) || []).length;
+    if(openFences % 2 !== 0){
+      var fr = currentLang !== 'en';
+      addMessage('assistant', fr
+        ? "⚠️ Ma réponse s'est interrompue en plein milieu — ça arrive parfois. Peux-tu simplement écrire \"continue\" pour que je reprenne?"
+        : "⚠️ My reply got cut off partway through — that happens sometimes. Can you just type \"continue\" so I can pick back up?");
+      els.sendBtn.disabled = false;
+      return;
+    }
+
     addMessage('assistant', reply);
     els.nextStageBtn.style.display = 'block';
     saveProgress();
