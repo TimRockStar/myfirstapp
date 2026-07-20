@@ -524,7 +524,9 @@ async function sendToAI(userText){
       })
     });
     var data = await res.json();
-    console.log('[MyFirstApp] Réponse brute:', data);
+    console.log('[MyFirstApp] finish_reason:', data.choices && data.choices[0] ? data.choices[0].finish_reason : 'N/A');
+    console.log('[MyFirstApp] Texte de la réponse:', data.choices && data.choices[0] ? data.choices[0].message.content : 'N/A');
+    console.log('[MyFirstApp] Tokens utilisés:', data.usage ? JSON.stringify(data.usage) : 'N/A');
     hideTyping();
     if(!data.choices || !data.choices[0]) throw new Error('Réponse IA invalide');
     var reply = data.choices[0].message.content.trim();
