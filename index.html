@@ -354,7 +354,7 @@ var STAGES_FR = [
     key: 'construire',
     title: '4. Construis ta première version',
     sub: 'Le vrai code, généré pour toi, prêt à copier-coller.',
-    system: "Tu es un mentor qui génère du vrai code HTML/CSS/JavaScript simple et fonctionnel pour un débutant complet, basé sur l'idée qu'il a décrite dans la conversation. Génère un SEUL fichier HTML complet et autonome (avec le CSS et le JS inclus dedans avec des balises <style> et <script>), simple mais fonctionnel, pour la fonctionnalité précise qu'il a choisie. Mets TOUJOURS le code complet dans un bloc de code avec trois accents graves et le mot html au début. Après le code, explique en mots très simples, sans jargon : (1) qu'il doit créer un nouveau fichier texte sur son ordinateur avec le Bloc-notes (Windows) ou TextEdit (Mac), (2) coller le code dedans, (3) le sauvegarder en choisissant bien 'Tous les fichiers' comme type et en nommant le fichier exactement index.html (pas .txt), (4) double-cliquer dessus pour l'ouvrir dans son navigateur et voir le résultat tout de suite, avant même de le publier en ligne.",
+    system: "Tu es un mentor qui génère du vrai code HTML/CSS/JavaScript simple et fonctionnel pour un débutant complet, basé sur l'idée qu'il a décrite dans la conversation. Génère un SEUL fichier HTML complet et autonome (avec le CSS et le JS inclus dedans avec des balises <style> et <script>), simple mais fonctionnel, pour la fonctionnalité précise qu'il a choisie. IMPORTANT — respecte absolument le principe 'commencer petit' : construis la version LA PLUS COURTE et LA PLUS SIMPLE possible qui démontre l'idée centrale — une seule fonctionnalité, un style minimal, PAS de contenu supplémentaire (pas plusieurs leçons, pas de vidéos intégrées, pas de sections multiples) même si la personne en a mentionné plusieurs — choisis-en UNE seule pour cette première version et dis-lui explicitement que le reste viendra dans une prochaine version. Vise un maximum d'environ 100 lignes de code. Mets TOUJOURS le code complet dans un bloc de code avec trois accents graves et le mot html au début, et assure-toi qu'il soit toujours complet (jamais coupé). Après le code, explique en mots très simples, sans jargon : (1) qu'il doit créer un nouveau fichier texte sur son ordinateur avec le Bloc-notes (Windows) ou TextEdit (Mac), (2) coller le code dedans, (3) le sauvegarder en choisissant bien 'Tous les fichiers' comme type et en nommant le fichier exactement index.html (pas .txt), (4) double-cliquer dessus pour l'ouvrir dans son navigateur et voir le résultat tout de suite, avant même de le publier en ligne.",
     firstMsg: "Génial! Je vais maintenant te générer un vrai fichier de code, prêt à copier-coller directement dans un nouveau fichier sur GitHub.\n\nDonne-moi encore quelques détails si tu veux personnaliser des couleurs ou des mots précis, ou dis-moi simplement \"vas-y\" et je te génère une première version tout de suite."
   },
   {
@@ -392,7 +392,7 @@ var STAGES_EN = [
     key: 'construire',
     title: '4. Build your first version',
     sub: 'Real code, generated for you, ready to copy-paste.',
-    system: "You are a mentor who generates real, simple, functional HTML/CSS/JavaScript code for a complete beginner, based on the idea they described in the conversation. Generate a SINGLE, complete, self-contained HTML file (with CSS and JS included inside it using <style> and <script> tags), simple but functional, for the exact feature they chose. ALWAYS put the complete code in a code block with three backticks and the word html at the start. After the code, explain in very simple words, no jargon: (1) they need to create a new text file on their computer using Notepad (Windows) or TextEdit (Mac), (2) paste the code into it, (3) save it by choosing 'All Files' as the type and naming the file exactly index.html (not .txt), (4) double-click it to open it in their browser and see the result right away, even before publishing it online.",
+    system: "You are a mentor who generates real, simple, functional HTML/CSS/JavaScript code for a complete beginner, based on the idea they described in the conversation. Generate a SINGLE, complete, self-contained HTML file (with CSS and JS included inside it using <style> and <script> tags), simple but functional, for the exact feature they chose. IMPORTANT — strictly follow the 'start small' principle: build the SHORTEST and SIMPLEST possible version that demonstrates the core idea — one single feature, minimal styling, NO extra content (no multiple lessons, no embedded videos, no multiple sections) even if the person mentioned several — pick just ONE for this first version and explicitly tell them the rest will come in a future version. Aim for a maximum of about 100 lines of code. ALWAYS put the complete code in a code block with three backticks and the word html at the start, and make sure it's always complete (never cut off). After the code, explain in very simple words, no jargon: (1) they need to create a new text file on their computer using Notepad (Windows) or TextEdit (Mac), (2) paste the code into it, (3) save it by choosing 'All Files' as the type and naming the file exactly index.html (not .txt), (4) double-click it to open it in their browser and see the result right away, even before publishing it online.",
     firstMsg: "Awesome! I'll now generate a real code file for you, ready to copy-paste directly into a new file on GitHub.\n\nGive me a few more details if you want to customize colors or specific wording, or just say \"go ahead\" and I'll generate a first version right away."
   },
   {
@@ -518,7 +518,7 @@ async function sendToAI(userText){
       body: JSON.stringify({
         model: 'qwen/qwen3.6-27b',
         reasoning_effort: 'none',
-        max_tokens: 1600,
+        max_tokens: 4000,
         temperature: temp,
         messages: messages
       })
@@ -680,6 +680,16 @@ els.storyNextBtn.addEventListener('click', function(){
 els.sendBtn.addEventListener('click', function(){
   var text = els.userInput.value.trim();
   if(!text) return;
+  // Si le micro écoute encore, on l'arrête avant d'envoyer — sinon il continue
+  // de réécrire par-dessus la boîte de texte juste après qu'elle se soit vidée.
+  if(typeof wantsListening !== 'undefined' && wantsListening){
+    wantsListening = false;
+    skipInputUpdateOnEnd = true;
+    recognition.stop();
+    els.micBtn.classList.remove('listening');
+    els.micBtn.style.display = 'flex';
+    els.micDoneBtn.style.display = 'none';
+  }
   sendToAI(text);
 });
 els.userInput.addEventListener('keydown', function(e){
@@ -699,6 +709,7 @@ if(SpeechRecognitionAPI){
   recognition.continuous = false; // une session = une phrase, plus stable sur mobile
   recognition.interimResults = true;
   var wantsListening = false;
+  var skipInputUpdateOnEnd = false; // évite que le nettoyage du micro n'écrase la boîte juste vidée par l'envoi
   var baseText = '';
   var sessionFinalText = ''; // texte confirmé de la session EN COURS seulement
 
@@ -718,12 +729,13 @@ if(SpeechRecognitionAPI){
       baseText = (baseText + ' ' + sessionFinalText).trim();
       sessionFinalText = '';
     }
-    els.userInput.value = baseText;
+    if(!skipInputUpdateOnEnd){ els.userInput.value = baseText; }
+    skipInputUpdateOnEnd = false;
 
     if(wantsListening){
-      setTimeout(function(){
-        if(wantsListening){ try{ recognition.start(); }catch(e){} }
-      }, 300); // petite pause avant de relancer — évite le cycle rapide qui causait le bug
+      // Redémarre tout de suite, sans délai — chaque petit délai ici risque de
+      // perdre les premiers mots si la personne recommence à parler rapidement.
+      try{ recognition.start(); }catch(e){}
     } else {
       els.micBtn.classList.remove('listening');
       els.micBtn.style.display = 'flex';
