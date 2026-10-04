@@ -142,9 +142,6 @@
 
   footer{text-align:center;font-size:11px;color:var(--sub);padding:1rem 0;}
 </style>
-<!-- ⚠️ TEMPORAIRE — Console de débogage mobile (Eruda). À RETIRER avant publication. -->
-<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-<script>eruda.init();</script>
 </head>
 <body>
 <div class="wrap">
@@ -229,7 +226,7 @@
 </div>
 
 <script>
-// Clé Groq éclatée en morceaux — évite la révocation automatique par GitHub.
+// Aucune clé dans ce fichier : les appels à l'IA passent par le relais.
 var currentLang = localStorage.getItem('myfirstapp_lang') || 'fr';
 
 var translations = {
@@ -312,7 +309,7 @@ function setLang(lang){
   }
 }
 
-var GEMINI_API_KEY = 'AQ.Ab8RN6LUO-P-N22W85KIxtO9NMD0KJfkSt6ocKZ9D7aaRMsXuQ';
+var RELAIS = 'https://relais-groq.smartgrocer.workers.dev';
 
 var STAGES_FR = [
   {
@@ -512,7 +509,7 @@ async function sendToAI(userText){
     var geminiContents = stageHistories[currentStage].map(function(m){
       return { role: (m.role === 'assistant' ? 'model' : 'user'), parts: [{ text: m.content }] };
     });
-    var res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=' + GEMINI_API_KEY, {
+    var res = await fetch(RELAIS + '/gemini/gemini-3.6-flash', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify({
